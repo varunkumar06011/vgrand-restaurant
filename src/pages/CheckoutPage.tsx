@@ -11,6 +11,7 @@ import { useCart } from '@/contexts/CartContext';
 import { createStripeCheckout, createOrder } from '@/db/api';
 import { toast } from 'sonner';
 import type { CheckoutData } from '@/types/restaurant';
+import CartSummary from '@/components/restaurant/CartSummary';
 
 const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
@@ -113,7 +114,7 @@ const CheckoutPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background py-8">
-      <div className="container mx-auto max-w-4xl px-4">
+      <div className="container mx-auto max-w-6xl px-4">
         <Button variant="ghost" onClick={() => step === 1 ? navigate('/menu') : setStep(step - 1)} className="mb-6">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
@@ -121,21 +122,24 @@ const CheckoutPage: React.FC = () => {
 
         <h1 className="mb-8 text-3xl font-bold text-foreground">Checkout</h1>
 
-        {/* Progress Indicator */}
-        <div className="mb-8 flex items-center justify-center gap-4">
-          {[1, 2, 3].map(s => (
-            <React.Fragment key={s}>
-              <div
-                className={`flex h-10 w-10 items-center justify-center rounded-full ${
-                  s <= step ? 'bg-secondary text-secondary-foreground' : 'bg-muted text-muted-foreground'
-                }`}
-              >
-                {s}
-              </div>
-              {s < 3 && <div className={`h-1 w-16 ${s < step ? 'bg-secondary' : 'bg-muted'}`} />}
-            </React.Fragment>
-          ))}
-        </div>
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          {/* Main Checkout Form - Takes 2 columns */}
+          <div className="lg:col-span-2">
+            {/* Progress Indicator */}
+            <div className="mb-8 flex items-center justify-center gap-4">
+              {[1, 2, 3].map(s => (
+                <React.Fragment key={s}>
+                  <div
+                    className={`flex h-10 w-10 items-center justify-center rounded-full ${
+                      s <= step ? 'bg-secondary text-secondary-foreground' : 'bg-muted text-muted-foreground'
+                    }`}
+                  >
+                    {s}
+                  </div>
+                  {s < 3 && <div className={`h-1 w-16 ${s < step ? 'bg-secondary' : 'bg-muted'}`} />}
+                </React.Fragment>
+              ))}
+            </div>
 
         {/* Step 1: Cart Review */}
         {step === 1 && (
@@ -329,6 +333,13 @@ const CheckoutPage: React.FC = () => {
             </CardContent>
           </Card>
         )}
+          </div>
+
+          {/* Order Summary Sidebar - Takes 1 column */}
+          <div className="hidden lg:block">
+            <CartSummary showActions={false} />
+          </div>
+        </div>
       </div>
     </div>
   );

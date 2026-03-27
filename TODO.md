@@ -45,6 +45,14 @@
   - [x] Run npm run lint
   - [x] Fix any issues
   - [x] Final verification
+- [x] Step 11: Enhanced Cart & Order Management
+  - [x] Add shopping bag icon with badge in TopNavigation
+  - [x] Create CartSummary component for sidebar display
+  - [x] Add CartSummary to MenuPage sidebar
+  - [x] Add CartSummary to CheckoutPage sidebar
+  - [x] Create MyOrdersPage for order tracking
+  - [x] Add My Orders link to navigation
+  - [x] Add View Orders buttons to success pages
 
 ## Notes
 - Payment: Requirements mention Razorpay but payment requirements tool returned Stripe implementation. Implemented Stripe as per tool guidance.
@@ -52,5 +60,8 @@
 - WhatsApp number placeholder: +919876543210 (to be replaced by restaurant)
 - Color scheme: #0F0F0F (dark), #8B0000 (red), #D4AF37 (gold)
 - Mobile-first design with sticky navigation
-- All features completed successfully
+- All features completed successfully including enhanced cart visibility and order management
 - Stripe secrets need to be configured by user
+- Shopping bag icon with live item count now visible in header
+- Cart summary sidebar shows on Menu and Checkout pages (desktop only)
+- My Orders page allows users to track orders by phone number

@@ -1,17 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Menu, ShoppingBag } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
+import CartDrawer from './CartDrawer';
 
 const TopNavigation: React.FC = () => {
   const location = useLocation();
   const { totalItems } = useCart();
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Menu', path: '/menu' },
+    { name: 'My Orders', path: '/my-orders' },
     { name: 'Function Hall', path: '/function-hall' },
     { name: 'Contact', path: '/contact' },
   ];
@@ -46,7 +50,21 @@ const TopNavigation: React.FC = () => {
           </nav>
 
           {/* Desktop CTA */}
-          <div className="hidden md:block">
+          <div className="hidden items-center gap-4 md:flex">
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative"
+            >
+              <ShoppingBag className="h-6 w-6 text-foreground transition-colors hover:text-secondary" />
+              {totalItems > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="absolute -right-2 -top-2 h-5 w-5 rounded-full p-0 text-xs"
+                >
+                  {totalItems}
+                </Badge>
+              )}
+            </button>
             <Button asChild variant="default" size="lg">
               <Link to="/menu">Order Now</Link>
             </Button>
@@ -86,6 +104,8 @@ const TopNavigation: React.FC = () => {
           </Sheet>
         </div>
       </div>
+
+      <CartDrawer open={isCartOpen} onOpenChange={setIsCartOpen} />
     </header>
   );
 };

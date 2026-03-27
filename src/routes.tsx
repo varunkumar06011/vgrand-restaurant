@@ -5,6 +5,7 @@ import PaymentSuccessPage from './pages/PaymentSuccessPage';
 import OrderSuccessPage from './pages/OrderSuccessPage';
 import FunctionHallPage from './pages/FunctionHallPage';
 import ContactPage from './pages/ContactPage';
+import MyOrdersPage from './pages/MyOrdersPage';
 import type { ReactNode } from 'react';
 
 interface RouteConfig {
@@ -39,6 +40,11 @@ const routes: RouteConfig[] = [
     name: 'Order Success',
     path: '/order-success',
     element: <OrderSuccessPage />
+  },
+  {
+    name: 'My Orders',
+    path: '/my-orders',
+    element: <MyOrdersPage />
   },
   {
     name: 'Function Hall',

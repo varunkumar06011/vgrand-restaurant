@@ -3,6 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import FilterBar, { type FilterState } from '@/components/restaurant/FilterBar';
 import MenuCard from '@/components/restaurant/MenuCard';
+import CartSummary from '@/components/restaurant/CartSummary';
 import { getMenuItems } from '@/db/api';
 import type { MenuItem, MenuCategory } from '@/types/restaurant';
 
@@ -106,37 +107,47 @@ const MenuPage: React.FC = () => {
 
         <FilterBar onFilterChange={setFilters} />
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-8">
-          <TabsList className="mb-8 flex w-full flex-wrap justify-start gap-2 bg-transparent">
-            {categories.map(cat => (
-              <TabsTrigger
-                key={cat.value}
-                value={cat.value}
-                className="data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground"
-              >
-                {cat.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+        <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+          {/* Menu Items - Takes 2 columns on large screens */}
+          <div className="lg:col-span-2">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="mb-8 flex w-full flex-wrap justify-start gap-2 bg-transparent">
+                {categories.map(cat => (
+                  <TabsTrigger
+                    key={cat.value}
+                    value={cat.value}
+                    className="data-[state=active]:bg-secondary data-[state=active]:text-secondary-foreground"
+                  >
+                    {cat.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
 
-          {categories.map(cat => (
-            <TabsContent key={cat.value} value={cat.value}>
-              {filteredItems.length === 0 ? (
-                <div className="py-16 text-center">
-                  <p className="text-lg text-muted-foreground">
-                    No items found. Try a different search or filter.
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {filteredItems.map(item => (
-                    <MenuCard key={item.id} item={item} />
-                  ))}
-                </div>
-              )}
-            </TabsContent>
-          ))}
-        </Tabs>
+              {categories.map(cat => (
+                <TabsContent key={cat.value} value={cat.value}>
+                  {filteredItems.length === 0 ? (
+                    <div className="py-16 text-center">
+                      <p className="text-lg text-muted-foreground">
+                        No items found. Try a different search or filter.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                      {filteredItems.map(item => (
+                        <MenuCard key={item.id} item={item} />
+                      ))}
+                    </div>
+                  )}
+                </TabsContent>
+              ))}
+            </Tabs>
+          </div>
+
+          {/* Cart Summary - Takes 1 column on large screens, hidden on mobile */}
+          <div className="hidden lg:block">
+            <CartSummary />
+          </div>
+        </div>
       </div>
     </div>
   );

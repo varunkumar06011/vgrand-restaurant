@@ -24,6 +24,9 @@ const OrderSuccessPage: React.FC = () => {
           </div>
 
           <div className="flex w-full flex-col gap-3 sm:flex-row">
+            <Button onClick={() => navigate('/my-orders')} variant="outline" className="flex-1">
+              View My Orders
+            </Button>
             <Button onClick={() => navigate('/')} variant="outline" className="flex-1">
               Back to Home
             </Button>
