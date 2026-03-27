@@ -1,4 +1,10 @@
-import SamplePage from './pages/SamplePage';
+import HomePage from './pages/HomePage';
+import MenuPage from './pages/MenuPage';
+import CheckoutPage from './pages/CheckoutPage';
+import PaymentSuccessPage from './pages/PaymentSuccessPage';
+import OrderSuccessPage from './pages/OrderSuccessPage';
+import FunctionHallPage from './pages/FunctionHallPage';
+import ContactPage from './pages/ContactPage';
 import type { ReactNode } from 'react';
 
 interface RouteConfig {
@@ -10,9 +16,39 @@ interface RouteConfig {
 
 const routes: RouteConfig[] = [
   {
-    name: 'Sample Page',
+    name: 'Home',
     path: '/',
-    element: <SamplePage />
+    element: <HomePage />
+  },
+  {
+    name: 'Menu',
+    path: '/menu',
+    element: <MenuPage />
+  },
+  {
+    name: 'Checkout',
+    path: '/checkout',
+    element: <CheckoutPage />
+  },
+  {
+    name: 'Payment Success',
+    path: '/payment-success',
+    element: <PaymentSuccessPage />
+  },
+  {
+    name: 'Order Success',
+    path: '/order-success',
+    element: <OrderSuccessPage />
+  },
+  {
+    name: 'Function Hall',
+    path: '/function-hall',
+    element: <FunctionHallPage />
+  },
+  {
+    name: 'Contact',
+    path: '/contact',
+    element: <ContactPage />
   }
 ];
 
