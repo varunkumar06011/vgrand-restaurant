@@ -53,6 +53,15 @@
   - [x] Create MyOrdersPage for order tracking
   - [x] Add My Orders link to navigation
   - [x] Add View Orders buttons to success pages
+- [x] Step 12: Distance-Based Delivery Fee & Logo
+  - [x] Create delivery fee calculation utility (lib/delivery.ts)
+  - [x] Implement distance-based pricing (₹50 beyond 10km)
+  - [x] Add delivery fee alert in checkout address field
+  - [x] Update CartSummary to support custom delivery fee
+  - [x] Download and add restaurant logo to public folder
+  - [x] Update TopNavigation with logo image
+  - [x] Update HeroSection with delivery policy
+  - [x] Update ContactPage with complete delivery information
 
 ## Notes
 - Payment: Requirements mention Razorpay but payment requirements tool returned Stripe implementation. Implemented Stripe as per tool guidance.
@@ -65,3 +74,6 @@
 - Shopping bag icon with live item count now visible in header
 - Cart summary sidebar shows on Menu and Checkout pages (desktop only)
 - My Orders page allows users to track orders by phone number
+- Distance-based delivery fee: Free within 10km (₹300+ orders), ₹30 (<₹300), ₹50 beyond 10km
+- Logo added to navigation (desktop and mobile)
+- Delivery fee calculation uses keyword detection for far locations

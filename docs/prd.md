@@ -42,7 +42,8 @@ V Grand Restaurant Website
 ### 3.2 Global Elements
 
 #### Sticky Top Navigation
-- Logo: V GRAND RESTAURANT (large dominant heading) + Raja of Biryanis (subtitle)
+- Logo: Image file — file name: Screenshot 2026-03-28 053614.png, file link: https://miaoda-conversation-file.s3cdn.medo.dev/user-ak8w2f9r7474/conv-ak97oa1kuy2o/20260328/file-ak9wfo88rchs.png — displayed at the top-left of the navigation bar as the restaurant logo
+- Brand text (adjacent to logo): V GRAND RESTAURANT (large dominant heading) + Raja of Biryanis (subtitle)
 - Nav links: Home | Menu | Function Hall | Contact
 - Sticky Order Now CTA button (top-right)
 - Cart Bag Icon (top-right, adjacent to Order Now): displays live item count badge; clicking opens the Cart Bag Drawer
@@ -86,7 +87,7 @@ V Grand Restaurant Website
   1. Order Now — primary (Deep Red #8B0000, gold border)
   2. Order on WhatsApp — secondary (WhatsApp green)
   3. View Location — tertiary (outlined)
-- Trust Line: Free delivery within 10km • Delivered in 30–35 mins
+- Trust Line: Free delivery within 10km • ₹50 extra charge beyond 10km • Delivered in 30–35 mins
 - Social Proof Tag: Top Rated on Zomato in Ongole
 
 #### Featured Biryanis Section
@@ -188,8 +189,11 @@ The Checkout Page is a dedicated page with a visible step indicator showing the 
   - Line total per item
   - Remove item option
 - Order subtotal displayed
-- Delivery fee displayed
-- Grand total displayed
+- Delivery fee displayed:
+  - Free delivery if delivery distance is within 10km
+  - ₹50 extra delivery charge if delivery distance exceeds 10km
+  - Delivery fee line item updates accordingly and is clearly labeled
+- Grand total displayed (subtotal + applicable delivery fee)
 - Continue button proceeds to Step 2
 - If cart is empty: redirect user to Menu page with prompt
 
@@ -198,12 +202,13 @@ The Checkout Page is a dedicated page with a visible step indicator showing the 
   - Name (text, required)
   - Phone Number (tel, required — 10-digit validation)
   - Delivery Address (textarea, required)
+- Distance input or note: a prompt is shown informing the user that deliveries beyond 10km incur an additional ₹50 charge; the delivery fee in Step 1 and Step 3 updates based on the address provided (if distance can be estimated) or defaults to showing both fee tiers with a note
 - Basic inline validation on all required fields
 - Continue button proceeds to Step 3
 - Back button returns to Step 1
 
 #### Step 3: Payment
-- Order summary recap (items, subtotal, delivery fee, grand total)
+- Order summary recap (items, subtotal, delivery fee — free or ₹50 extra as applicable, grand total)
 - Payment options:
   - COD (Cash on Delivery) — default selected
   - Online Payment (Razorpay / UPI)
@@ -220,7 +225,7 @@ The Checkout Page is a dedicated page with a visible step indicator showing the 
 - Displayed after successful order placement (COD or online payment)
 - Shows:
   - Order confirmation message
-  - Order summary (items ordered, total amount, payment method)
+  - Order summary (items ordered, total amount, delivery fee applied, payment method)
   - Estimated delivery time: 30–35 mins
   - CTA: Order More (returns to Menu page)
 
@@ -235,6 +240,8 @@ The Checkout Page is a dedicated page with a visible step indicator showing the 
     Hi, I want to order:
     - [Item Name] x[Qty]
     - [Item Name] x[Qty]
+    Subtotal: ₹[XXX]
+    Delivery: Free / ₹50 extra (beyond 10km)
     Total: ₹[XXX]
     ```
 - If cart is empty: open WhatsApp with generic greeting message
@@ -281,16 +288,17 @@ The Checkout Page is a dedicated page with a visible step indicator showing the 
 1. **Direct Order Priority:** All primary CTAs direct users to the on-site checkout or WhatsApp flow. No Zomato/Swiggy links are featured.
 2. **Cart Persistence:** Cart contents persist across page navigation within the session (session storage). The Cart Bag Drawer reflects the current cart state at all times.
 3. **Cart Bag Icon Badge:** The cart icon badge in the top navigation and the Cart tab in the sticky bottom navigation display the live total item count and update in real time.
-4. **WhatsApp Message Generation:** If cart is non-empty when WhatsApp CTA is triggered, the message is auto-populated from cart data. If cart is empty, a default greeting is used.
+4. **WhatsApp Message Generation:** If cart is non-empty when WhatsApp CTA is triggered, the message is auto-populated from cart data including the applicable delivery fee. If cart is empty, a default greeting is used.
 5. **Razorpay Integration:** Online payment is triggered only when the user selects the online payment option at Step 3. COD requires no payment gateway call.
 6. **Checkout Step Progression:** Users must complete each step in sequence (Step 1 → Step 2 → Step 3). Navigation back to a previous step is permitted.
 7. **Checkout Cart Validation:** If the cart is empty when the user attempts to access the Checkout Page, they are redirected to the Menu page with a prompt to add items.
-8. **Function Hall Form Submission:** Guest count must be between 100 and 150. Dates in the past are not selectable.
-9. **Review Submission:** Review form collects name, star rating (1–5), and text. Submitted reviews are stored in backend and displayed after moderation (or immediately, per restaurant preference).
-10. **Coupon on Review:** Upon successful review submission, a coupon code is displayed to the user.
-11. **Menu Filtering:** Filters are combinable and applied client-side in real time. Search is debounced at 300ms.
-12. **Urgency & Conversion Tags:** Bestseller, Spicy, New, and Hot badges are applied per item. Save ₹50 vs Zomato callout is displayed in the Why Choose Us section and near CTAs.
-13. **Delivery Scope:** Free delivery within 10km. Delivery time displayed as 30–35 mins.
+8. **Delivery Fee Rule:** Delivery is free for addresses within 10km of the restaurant. An additional ₹50 delivery charge applies for addresses beyond 10km. This fee is clearly displayed in the cart review, order summary, and order confirmation screens.
+9. **Function Hall Form Submission:** Guest count must be between 100 and 150. Dates in the past are not selectable.
+10. **Review Submission:** Review form collects name, star rating (1–5), and text. Submitted reviews are stored in backend and displayed after moderation (or immediately, per restaurant preference).
+11. **Coupon on Review:** Upon successful review submission, a coupon code is displayed to the user.
+12. **Menu Filtering:** Filters are combinable and applied client-side in real time. Search is debounced at 300ms.
+13. **Urgency & Conversion Tags:** Bestseller, Spicy, New, and Hot badges are applied per item. Save ₹50 vs Zomato callout is displayed in the Why Choose Us section and near CTAs.
+14. **Delivery Scope:** Free delivery within 10km; ₹50 extra charge beyond 10km. Delivery time displayed as 30–35 mins.
 
 ---
 
@@ -309,31 +317,33 @@ The Checkout Page is a dedicated page with a visible step indicator showing the 
 | Image fails to load | Show branded placeholder with item name |
 | Phone number invalid at checkout | Inline validation: Please enter a valid 10-digit phone number |
 | User navigates away mid-checkout | Cart contents preserved in session storage; user can resume |
+| Delivery distance exceeds 10km | ₹50 extra delivery charge applied and clearly shown in cart, order summary, and confirmation |
 
 ---
 
 ## 6. Acceptance Criteria
 
-1. Home page hero section renders with full-width visual, CSS animation, headline, subtext, 3 CTA buttons, trust line, and social proof tag.
-2. Sticky top navigation is visible and functional on all pages; cart bag icon with live badge count is visible in the top navigation on all pages.
+1. Home page hero section renders with full-width visual, CSS animation, headline, subtext, 3 CTA buttons, trust line (including ₹50 extra charge note for beyond 10km), and social proof tag.
+2. Sticky top navigation is visible and functional on all pages; the uploaded logo image is displayed at the top-left; cart bag icon with live badge count is visible in the top navigation on all pages.
 3. Sticky bottom navigation is visible on mobile with Cart tab showing live badge count.
 4. Cart Bag Drawer opens on cart icon click from any page, displays all selected items with image, name, quantity controls, line total, and remove option, and shows correct subtotal.
 5. Cart Bag Drawer Proceed to Checkout button navigates to the Checkout Page Step 1.
 6. Menu page displays all 8 categories with card-based UI; each card shows image, name, price, description, tags, quantity selector, and Add to Stomach button.
 7. Real-time search filters menu items within 300ms of input; multi-filter combinations work correctly without page reload.
 8. Checkout Page displays a 3-step progress indicator: Cart Review → Delivery Details → Payment.
-9. Step 1 (Cart Review) shows full cart summary with editable quantities, subtotal, delivery fee, and grand total.
-10. Step 2 (Delivery Details) validates Name, Phone Number (10-digit), and Delivery Address as required fields with inline error messages.
-11. Step 3 (Payment) displays order summary recap and payment options (COD default, Razorpay/UPI).
-12. COD order placement shows order confirmation screen with order summary and estimated delivery time.
+9. Step 1 (Cart Review) shows full cart summary with editable quantities, subtotal, delivery fee (free within 10km / ₹50 extra beyond 10km), and grand total.
+10. Step 2 (Delivery Details) validates Name, Phone Number (10-digit), and Delivery Address as required fields with inline error messages; delivery fee note is displayed.
+11. Step 3 (Payment) displays order summary recap including correct delivery fee and payment options (COD default, Razorpay/UPI).
+12. COD order placement shows order confirmation screen with order summary (including delivery fee applied) and estimated delivery time.
 13. Razorpay payment gateway triggers on online payment selection; success and failure states are handled with appropriate UI feedback including retry and COD fallback options.
-14. WhatsApp CTA generates a correctly formatted pre-filled message from cart contents and opens via wa.me link.
+14. WhatsApp CTA generates a correctly formatted pre-filled message from cart contents including applicable delivery fee and opens via wa.me link.
 15. Function hall booking form validates all required fields, disables past dates, enforces guest count 100–150, and shows confirmation on submission.
 16. Google Maps embed loads correctly on the Contact page; click-to-call and WhatsApp buttons are functional.
 17. All images use WebP format with lazy loading.
 18. Design system is consistently applied: #0F0F0F background, #8B0000 primary, #D4AF37 accents, serif headings, sans-serif body.
 19. Website is fully responsive and mobile-first; no layout breakage on screens 320px and above.
 20. Review submission form works; coupon code is displayed upon successful submission.
+21. ₹50 extra delivery charge is correctly applied, displayed, and included in all order totals whenever the delivery distance exceeds 10km.
 
 ---
 
@@ -350,3 +360,4 @@ The Checkout Page is a dedicated page with a visible step indicator showing the 
 - Third-party delivery integrations (Zomato, Swiggy APIs)
 - Actual menu item images (to be provided by restaurant before launch)
 - Actual business hours, amenities list, and WhatsApp number (to be provided by restaurant)
+- Automated distance detection from delivery address (distance-based fee is applied based on user acknowledgment or manual input in this release)

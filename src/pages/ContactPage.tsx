@@ -85,10 +85,11 @@ const ContactPage: React.FC = () => {
                 <div className="rounded-lg border border-secondary bg-secondary/10 p-4">
                   <h3 className="mb-2 font-semibold text-foreground">Delivery Information</h3>
                   <ul className="space-y-1 text-sm text-muted-foreground">
-                    <li>✓ Free delivery within 10km</li>
+                    <li>✓ Free delivery within 10km (Orders ₹300+)</li>
+                    <li>✓ ₹50 delivery charge beyond 10km</li>
+                    <li>✓ ₹30 delivery fee for orders below ₹300</li>
                     <li>✓ Delivery time: 30–35 minutes</li>
-                    <li>✓ Minimum order: ₹200</li>
-                    <li>✓ Cash on Delivery available</li>
+                    <li>✓ Cash on Delivery & Online Payment available</li>
                   </ul>
                 </div>
               </CardContent>

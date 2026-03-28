@@ -27,11 +27,14 @@ const TopNavigation: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between md:h-20">
           {/* Logo */}
-          <Link to="/" className="flex flex-col">
-            <span className="text-xl font-bold text-foreground md:text-2xl">
-              V GRAND RESTAURANT
-            </span>
-            <span className="text-xs text-secondary md:text-sm">Raja of Biryanis</span>
+          <Link to="/" className="flex items-center gap-3">
+            <img src="/logo.png" alt="V Grand Restaurant Logo" className="h-12 w-12 object-contain md:h-14 md:w-14" />
+            <div className="flex flex-col">
+              <span className="text-xl font-bold text-foreground md:text-2xl">
+                V GRAND RESTAURANT
+              </span>
+              <span className="text-xs text-secondary md:text-sm">Raja of Biryanis</span>
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
@@ -79,11 +82,14 @@ const TopNavigation: React.FC = () => {
             </SheetTrigger>
             <SheetContent side="right" className="w-64">
               <div className="flex flex-col gap-4 pt-8">
-                <Link to="/" className="mb-4 flex flex-col">
-                  <span className="text-lg font-bold text-foreground">
-                    V GRAND RESTAURANT
-                  </span>
-                  <span className="text-xs text-secondary">Raja of Biryanis</span>
+                <Link to="/" className="mb-4 flex items-center gap-2">
+                  <img src="/logo.png" alt="V Grand Restaurant Logo" className="h-10 w-10 object-contain" />
+                  <div className="flex flex-col">
+                    <span className="text-lg font-bold text-foreground">
+                      V GRAND RESTAURANT
+                    </span>
+                    <span className="text-xs text-secondary">Raja of Biryanis</span>
+                  </div>
                 </Link>
                 {navLinks.map(link => (
                   <Link

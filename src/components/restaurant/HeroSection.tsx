@@ -57,7 +57,7 @@ const HeroSection: React.FC = () => {
 
         {/* Trust Line */}
         <div className="mt-8 flex flex-col gap-2 text-sm text-foreground/80 md:flex-row md:gap-4 md:text-base">
-          <span>⚡ Free delivery within 10km</span>
+          <span>⚡ Free delivery within 10km (₹50 beyond 10km)</span>
           <span className="hidden md:inline">•</span>
           <span>🚀 Delivered in 30–35 mins</span>
         </div>

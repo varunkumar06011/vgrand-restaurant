@@ -8,11 +8,15 @@ import { useNavigate } from 'react-router-dom';
 
 interface CartSummaryProps {
   showActions?: boolean;
+  deliveryFee?: number;
 }
 
-const CartSummary: React.FC<CartSummaryProps> = ({ showActions = true }) => {
+const CartSummary: React.FC<CartSummaryProps> = ({ showActions = true, deliveryFee: customDeliveryFee }) => {
   const { items, removeItem, totalAmount } = useCart();
   const navigate = useNavigate();
+
+  // Use custom delivery fee if provided, otherwise calculate default
+  const deliveryFee = customDeliveryFee !== undefined ? customDeliveryFee : (totalAmount >= 300 ? 0 : 30);
 
   if (items.length === 0) {
     return (
@@ -71,14 +75,14 @@ const CartSummary: React.FC<CartSummaryProps> = ({ showActions = true }) => {
           <div className="flex justify-between text-sm">
             <span className="text-muted-foreground">Delivery Fee</span>
             <span className="font-medium text-foreground">
-              {totalAmount >= 300 ? 'FREE' : '₹30'}
+              {deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}
             </span>
           </div>
           <Separator />
           <div className="flex justify-between">
             <span className="font-semibold text-foreground">Total</span>
             <span className="text-lg font-bold text-secondary">
-              ₹{totalAmount + (totalAmount >= 300 ? 0 : 30)}
+              ₹{totalAmount + deliveryFee}
             </span>
           </div>
         </div>
@@ -89,9 +93,9 @@ const CartSummary: React.FC<CartSummaryProps> = ({ showActions = true }) => {
           </Button>
         )}
 
-        {totalAmount < 300 && (
+        {deliveryFee > 0 && totalAmount < 300 && (
           <p className="text-center text-xs text-muted-foreground">
-            Add ₹{300 - totalAmount} more for free delivery
+            Add ₹{300 - totalAmount} more for free delivery within 10km
           </p>
         )}
       </CardContent>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,12 +6,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Minus, Plus, Trash2, ArrowLeft } from 'lucide-react';
+import { Minus, Plus, Trash2, ArrowLeft, Info } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { createStripeCheckout, createOrder } from '@/db/api';
 import { toast } from 'sonner';
 import type { CheckoutData } from '@/types/restaurant';
 import CartSummary from '@/components/restaurant/CartSummary';
+import { calculateDeliveryFee } from '@/lib/delivery';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
@@ -26,6 +28,17 @@ const CheckoutPage: React.FC = () => {
   });
   const [submitting, setSubmitting] = useState(false);
 
+  // Calculate delivery fee based on address
+  const deliveryFeeResult = useMemo(() => {
+    if (checkoutData.delivery_address.trim()) {
+      return calculateDeliveryFee(checkoutData.delivery_address, totalAmount);
+    }
+    return { fee: totalAmount >= 300 ? 0 : 30, distance: null, message: 'Enter address to calculate delivery fee' };
+  }, [checkoutData.delivery_address, totalAmount]);
+
+  const deliveryFee = deliveryFeeResult.fee;
+  const finalTotal = totalAmount + deliveryFee;
+
   if (items.length === 0) {
     return (
       <div className="container mx-auto flex min-h-[60vh] items-center justify-center px-4">
@@ -37,9 +50,6 @@ const CheckoutPage: React.FC = () => {
       </div>
     );
   }
-
-  const deliveryFee = totalAmount >= 300 ? 0 : 30;
-  const finalTotal = totalAmount + deliveryFee;
 
   const handleContinue = () => {
     if (step === 1) {
@@ -269,6 +279,14 @@ const CheckoutPage: React.FC = () => {
                   placeholder="Enter complete delivery address"
                   required
                 />
+                {checkoutData.delivery_address.trim() && (
+                  <Alert className="mt-3">
+                    <Info className="h-4 w-4" />
+                    <AlertDescription>
+                      {deliveryFeeResult.message}
+                    </AlertDescription>
+                  </Alert>
+                )}
               </div>
 
               <Button onClick={handleContinue} className="w-full" size="lg">
@@ -337,7 +355,7 @@ const CheckoutPage: React.FC = () => {
 
           {/* Order Summary Sidebar - Takes 1 column */}
           <div className="hidden lg:block">
-            <CartSummary showActions={false} />
+            <CartSummary showActions={false} deliveryFee={deliveryFee} />
           </div>
         </div>
       </div>
