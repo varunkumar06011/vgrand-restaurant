@@ -21,9 +21,10 @@ const FeaturedBiryanis: React.FC = () => {
   const loadBestsellerItems = async () => {
     try {
       const data = await getBestsellerItems();
-      setItems(data);
+      setItems(data || []);
     } catch (error) {
       console.error('Failed to load bestseller items:', error);
+      setItems([]);
     } finally {
       setLoading(false);
     }
@@ -66,40 +67,46 @@ const FeaturedBiryanis: React.FC = () => {
         </h2>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map(item => (
-            <Card key={item.id} className="group overflow-hidden transition-shadow hover:shadow-lg">
-              <div className="relative h-48 overflow-hidden">
-                <img
-                  src={item.image_url || 'placeholder-biryani.jpg'}
-                  alt={item.name}
-                  className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                  loading="lazy"
-                />
-                {item.is_bestseller && (
-                  <Badge className="absolute right-2 top-2 bg-secondary text-secondary-foreground">
-                    Bestseller
-                  </Badge>
-                )}
-                {!item.is_veg && (
-                  <Badge variant="destructive" className="absolute left-2 top-2">
-                    Non-Veg
-                  </Badge>
-                )}
-              </div>
-              <CardContent className="p-4">
-                <h3 className="mb-2 text-lg font-semibold text-foreground">{item.name}</h3>
-                <p className="mb-3 line-clamp-2 text-sm text-muted-foreground">
-                  {item.description}
-                </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-xl font-bold text-secondary">₹{item.price}</span>
-                  <Button onClick={() => handleAddToCart(item)} size="sm">
-                    Add to Cart
-                  </Button>
+          {items && items.length > 0 ? (
+            items.map(item => (
+              <Card key={item.id} className="group overflow-hidden transition-shadow hover:shadow-lg">
+                <div className="relative h-48 overflow-hidden">
+                  <img
+                    src={item.image_url || 'placeholder-biryani.jpg'}
+                    alt={item.name}
+                    className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                    loading="lazy"
+                  />
+                  {item.is_bestseller && (
+                    <Badge className="absolute right-2 top-2 bg-secondary text-secondary-foreground">
+                      Bestseller
+                    </Badge>
+                  )}
+                  {!item.is_veg && (
+                    <Badge variant="destructive" className="absolute left-2 top-2">
+                      Non-Veg
+                    </Badge>
+                  )}
                 </div>
-              </CardContent>
-            </Card>
-          ))}
+                <CardContent className="p-4">
+                  <h3 className="mb-2 text-lg font-semibold text-foreground">{item.name}</h3>
+                  <p className="mb-3 line-clamp-2 text-sm text-muted-foreground">
+                    {item.description}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xl font-bold text-secondary">₹{item.price}</span>
+                    <Button onClick={() => handleAddToCart(item)} size="sm">
+                      Add to Cart
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <div className="col-span-full py-8 text-center text-muted-foreground">
+              No bestseller items available
+            </div>
+          )}
         </div>
 
         <div className="mt-8 text-center">

@@ -40,7 +40,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({ showActions = true, deliveryF
       <CardContent className="space-y-4">
         {/* Items List */}
         <div className="max-h-64 space-y-3 overflow-y-auto">
-          {items.map(item => (
+          {items && items.length > 0 && items.map(item => (
             <div key={item.id} className="flex gap-3">
               <img
                 src={item.image_url || 'placeholder-food.jpg'}

@@ -25,9 +25,10 @@ const MenuPage: React.FC = () => {
   const loadMenuItems = async () => {
     try {
       const data = await getMenuItems();
-      setItems(data);
+      setItems(data || []);
     } catch (error) {
       console.error('Failed to load menu items:', error);
+      setItems([]);
     } finally {
       setLoading(false);
     }
@@ -46,6 +47,8 @@ const MenuPage: React.FC = () => {
   ];
 
   const filteredItems = useMemo(() => {
+    if (!items || items.length === 0) return [];
+    
     let result = [...items];
 
     // Filter by active tab

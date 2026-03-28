@@ -19,9 +19,10 @@ const ReviewsSection: React.FC = () => {
   const loadReviews = async () => {
     try {
       const data = await getApprovedReviews();
-      setReviews(data.slice(0, 6));
+      setReviews((data || []).slice(0, 6));
     } catch (error) {
       console.error('Failed to load reviews:', error);
+      setReviews([]);
     } finally {
       setLoading(false);
     }
@@ -64,29 +65,35 @@ const ReviewsSection: React.FC = () => {
           </h2>
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {reviews.map(review => (
-              <Card key={review.id} className="transition-shadow hover:shadow-lg">
-                <CardContent className="p-6">
-                  <div className="mb-3 flex items-center gap-1">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`h-5 w-5 ${
-                          i < review.rating
-                            ? 'fill-secondary text-secondary'
-                            : 'fill-muted text-muted'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <p className="mb-4 text-foreground">{review.review_text}</p>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <span className="font-medium">{review.name}</span>
-                    <span>{formatDate(review.created_at)}</span>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+            {reviews && reviews.length > 0 ? (
+              reviews.map(review => (
+                <Card key={review.id} className="transition-shadow hover:shadow-lg">
+                  <CardContent className="p-6">
+                    <div className="mb-3 flex items-center gap-1">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`h-5 w-5 ${
+                            i < review.rating
+                              ? 'fill-secondary text-secondary'
+                              : 'fill-muted text-muted'
+                          }`}
+                        />
+                      ))}
+                    </div>
+                    <p className="mb-4 text-foreground">{review.review_text}</p>
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                      <span className="font-medium">{review.name}</span>
+                      <span>{formatDate(review.created_at)}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            ) : (
+              <div className="col-span-full py-8 text-center text-muted-foreground">
+                No reviews yet. Be the first to review!
+              </div>
+            )}
           </div>
 
           <div className="mt-8 text-center">
