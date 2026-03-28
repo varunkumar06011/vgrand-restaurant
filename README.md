@@ -1,95 +1,88 @@
-# Welcome to Your Miaoda Project
-Miaoda Application Link URL
-    URL:https://medo.dev/projects/app-ak97oa1kuy2p
+# V Grand Restaurant - Premium Ordering Platform
 
-# Welcome to Your Miaoda Project
+V Grand Restaurant is a modern, production-ready web application for restaurant ordering, specifically tailored for the "Raja of Biryanis" in Ongole. Built with a focus on speed, mobile responsiveness, and seamless user experience.
 
-## Project Info
+## 🚀 Live Demo
+The application is currently configured for local development and testing.
 
-## Project Directory
+## ✨ Features
 
-```
-├── README.md # Documentation
-├── components.json # Component library configuration
-├── index.html # Entry file
-├── package.json # Package management
-├── postcss.config.js # PostCSS configuration
-├── public # Static resources directory
-│   ├── favicon.png # Icon
-│   └── images # Image resources
-├── src # Source code directory
-│   ├── App.tsx # Entry file
-│   ├── components # Components directory
-│   ├── context # Context directory
-│   ├── db # Database configuration directory
-│   ├── hooks # Common hooks directory
-│   ├── index.css # Global styles
-│   ├── layout # Layout directory
-│   ├── lib # Utility library directory
-│   ├── main.tsx # Entry file
-│   ├── routes.tsx # Routing configuration
-│   ├── pages # Pages directory
-│   ├── services # Database interaction directory
-│   ├── types # Type definitions directory
-├── tsconfig.app.json # TypeScript frontend configuration file
-├── tsconfig.json # TypeScript configuration file
-├── tsconfig.node.json # TypeScript Node.js configuration file
-└── vite.config.ts # Vite configuration file
-```
+- **Biryani Specialization**: Highlights signature dishes like Mutton Biryani and the "Special Kumbhakarna Biryani."
+- **Seamless Ordering**: Streamlined guest checkout flow without the need for mandatory authentication.
+- **Dynamic Cart**: Real-time shopping bag integration with live item counts and persistent state.
+- **Smart Delivery Fees**: Automated distance-based delivery fee calculation logic:
+  - **Free**: Within 10km for orders over ₹300.
+  - **₹30**: Within 10km for orders under ₹300.
+  - **₹50**: Beyond 10km or for far locations.
+- **Order Tracking**: "My Orders" page for tracking order history via phone number.
+- **WhatsApp Integration**: Direct "Order on WhatsApp" functionality for quick customer support and alternate ordering.
+- **Mobile-First Design**: Fully responsive UI with sticky navigation and premium aesthetics (#0F0F0F Dark, #8B0000 Red, #D4AF37 Gold).
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-Vite, TypeScript, React, Supabase
+- **Frontend**: [React](https://reactjs.org/) + [TypeScript](https://www.typescriptlang.org/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) + [Radix UI](https://www.radix-ui.com/)
+- **State Management**: React Context & Hooks
+- **Backend/Database**: [Supabase](https://supabase.com/)
+- **Icons**: Lucide React
+- **Animations**: Motion
 
-## Development Guidelines
+## 📦 Getting Started
 
-### How to edit code locally?
+### Prerequisites
+- Node.js ≥ 20
+- npm ≥ 10
 
-You can choose [VSCode](https://code.visualstudio.com/Download) or any IDE you prefer. The only requirement is to have Node.js and npm installed.
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/varunkumar06011/vgrand-restaurant.git
+   cd vgrand-restaurant
+   ```
 
-### Environment Requirements
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-```
-# Node.js ≥ 20
-# npm ≥ 10
-Example:
-# node -v   # v20.18.3
-# npm -v    # 10.8.2
-```
+3. Environment Setup:
+   Create a `.env` file in the root directory and add your Supabase credentials:
+   ```env
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_anon_key
+   ```
 
-### Installing Node.js on Windows
+4. Run the development server:
+   ```bash
+   npx vite --host 127.0.0.1
+   ```
+   Open [http://127.0.0.1:5173/](http://127.0.0.1:5173/) in your browser.
 
-```
-# Step 1: Visit the Node.js official website: https://nodejs.org/, click download. The website will automatically suggest a suitable version (32-bit or 64-bit) for your system.
-# Step 2: Run the installer: Double-click the downloaded installer to run it.
-# Step 3: Complete the installation: Follow the installation wizard to complete the process.
-# Step 4: Verify installation: Open Command Prompt (cmd) or your IDE terminal, and type `node -v` and `npm -v` to check if Node.js and npm are installed correctly.
-```
+## 📁 Project Structure
 
-### Installing Node.js on macOS
-
-```
-# Step 1: Using Homebrew (Recommended method): Open Terminal. Type the command `brew install node` and press Enter. If Homebrew is not installed, you need to install it first by running the following command in Terminal:
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-Alternatively, use the official installer: Visit the Node.js official website. Download the macOS .pkg installer. Open the downloaded .pkg file and follow the prompts to complete the installation.
-# Step 2: Verify installation: Open Command Prompt (cmd) or your IDE terminal, and type `node -v` and `npm -v` to check if Node.js and npm are installed correctly.
-```
-
-### After installation, follow these steps:
-
-```
-# Step 1: Download the code package
-# Step 2: Extract the code package
-# Step 3: Open the code package with your IDE and navigate into the code directory
-# Step 4: In the IDE terminal, run the command to install dependencies: npm i
-# Step 5: In the IDE terminal, run the command to start the development server: npm run dev -- --host 127.0.0.1
-# Step 6: if step 5 failed, try this command to start the development server: npx vite --host 127.0.0.1
+```text
+├── src/
+│   ├── components/    # Reusable UI components
+│   ├── pages/         # Page-level components (Home, Menu, Checkout, My Orders)
+│   ├── context/       # Global state management
+│   ├── services/      # Supabase & API interaction logic
+│   ├── layout/        # Shared layouts (Navbar, Footer)
+│   ├── lib/           # Utility functions (cn, delivery fee logic)
+│   ├── types/         # TypeScript definitions
+│   └── main.tsx       # Entry point
+├── supabase/          # Database migrations & schemas
+├── public/            # Static assets
+└── tailwind.config.js # Styling configurations
 ```
 
-### How to develop backend services?
+## 🛡️ Security & Quality
+- **Audit**: Zero high-risk vulnerabilities found in dependency audit.
+- **Linting**: Biome-based linting for code quality.
+- **Safety**: Null/undefined safety checks implemented across all data-driven components.
 
-Configure environment variables and install relevant dependencies.If you need to use a database, please use the official version of Supabase.
+## 📄 License
+Internal use only.
 
-## Learn More
-
-You can also check the help documentation: Download and Building the app（ [https://intl.cloud.baidu.com/en/doc/MIAODA/s/download-and-building-the-app-en](https://intl.cloud.baidu.com/en/doc/MIAODA/s/download-and-building-the-app-en)）to learn more detailed content.
+---
+Developed for **V Grand Restaurant - Raja of Biryanis.**
