@@ -137,7 +137,7 @@ const ReviewModal: React.FC<ReviewModalProps> = ({ open, onOpenChange, onSuccess
             <div className="space-y-4 py-4">
               <div className="rounded-lg bg-secondary/20 p-6 text-center">
                 <p className="mb-2 text-sm text-muted-foreground">Your Coupon Code:</p>
-                <p className="text-2xl font-bold text-secondary">VGRAND50</p>
+                <p className="text-2xl font-bold text-secondary">VGRANDREST50</p>
                 <p className="mt-2 text-sm text-muted-foreground">
                   Get ₹50 off on your next order above ₹500
                 </p>

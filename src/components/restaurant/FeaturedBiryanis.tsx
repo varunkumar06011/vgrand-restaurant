@@ -62,15 +62,15 @@ const FeaturedBiryanis: React.FC = () => {
   return (
     <section className="bg-background py-12 md:py-16">
       <div className="container mx-auto px-4">
-        <h2 className="mb-8 text-center text-3xl font-bold text-foreground md:text-4xl">
-          Our Bestsellers
+        <h2 className="mb-16 text-center text-4xl md:text-7xl font-bold uppercase tracking-tight text-white">
+          Signature <span className="text-primary underline decoration-white/10">Biryanis</span>
         </h2>
 
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3">
           {items && items.length > 0 ? (
             items.map(item => (
-              <Card key={item.id} className="group overflow-hidden transition-shadow hover:shadow-lg">
-                <div className="relative h-48 overflow-hidden">
+              <Card key={item.id} className="group overflow-hidden bg-card/40 border-white/5 hover:border-primary/50 transition-all duration-500 rounded-none relative">
+                <div className="relative h-64 overflow-hidden">
                   <img
                     src={item.image_url || 'placeholder-biryani.jpg'}
                     alt={item.name}
@@ -95,8 +95,8 @@ const FeaturedBiryanis: React.FC = () => {
                   </p>
                   <div className="flex items-center justify-between">
                     <span className="text-xl font-bold text-secondary">₹{item.price}</span>
-                    <Button onClick={() => handleAddToCart(item)} size="sm">
-                      Add to Cart
+                    <Button onClick={() => handleAddToCart(item)} size="lg" className="shadow-lg">
+                      Order Now
                     </Button>
                   </div>
                 </CardContent>

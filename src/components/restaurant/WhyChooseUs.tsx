@@ -33,13 +33,13 @@ const WhyChooseUs: React.FC = () => {
   return (
     <section className="bg-card py-12 md:py-16">
       <div className="container mx-auto px-4">
-        <h2 className="mb-12 text-center text-3xl font-bold text-foreground md:text-4xl">
+        <h2 className="mb-12 text-center text-3xl font-bold text-foreground md:text-5xl">
           Why Choose V Grand Restaurant?
         </h2>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {features.map((feature, index) => (
-            <Card key={index} className="border-border bg-background transition-shadow hover:shadow-lg">
+            <Card key={index} className="border-border bg-background transition-all hover:shadow-2xl hover:-translate-y-2 rounded-[2rem]">
               <CardContent className="flex flex-col items-center p-6 text-center">
                 <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-secondary/20">
                   <feature.icon className="h-8 w-8 text-secondary" />
@@ -53,8 +53,8 @@ const WhyChooseUs: React.FC = () => {
         </div>
 
         {/* Special Callout */}
-        <div className="mt-12 rounded-lg border-2 border-secondary bg-secondary/10 p-6 text-center">
-          <p className="text-lg font-semibold text-foreground md:text-xl">
+        <div className="mt-12 rounded-[2rem] border-2 border-secondary bg-secondary/10 p-10 text-center">
+          <p className="text-xl font-bold text-foreground md:text-2xl">
             💰 Order directly and save money! No platform fees, no surge pricing.
           </p>
           <p className="mt-2 text-muted-foreground">

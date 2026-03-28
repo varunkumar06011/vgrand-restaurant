@@ -11,7 +11,7 @@ const IntersectObserver = () => {
     // We use a small timeout to ensure the DOM has updated.
     const timer = setTimeout(() => {
         Observer.restart();
-    }, 100);
+    }, 50);
 
     return () => clearTimeout(timer);
   }, [location]);
