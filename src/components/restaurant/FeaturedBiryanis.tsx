@@ -102,9 +102,9 @@ const FeaturedBiryanis: React.FC = () => {
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-xl font-bold text-secondary">₹{item.price}</span>
                     {getCartQty(item.id) === 0 ? (
-                      <Button onClick={() => handleAddToCart(item)} size="sm" className="shadow-lg">
+                      <button onClick={() => handleAddToCart(item)} className="add-to-cart-pill">
                         Add to Cart
-                      </Button>
+                      </button>
                     ) : (
                       <div className="flex items-center gap-1 bg-white/5 border border-primary/40 rounded-full p-1">
                         <Button

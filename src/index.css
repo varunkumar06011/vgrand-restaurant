@@ -137,6 +137,79 @@ All colors MUST be HSL.
   }
 }
 
+/* ============================================================
+   ADD TO CART — Pill button with left-to-right orange fill
+   Uses background-position slide (no pseudo-elements / no z-index issues)
+   Text is always in natural flow, always readable on top.
+   ============================================================ */
+.add-to-cart-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Pill shape */
+  border-radius: 50px;
+  padding: 0.6rem 1.5rem;
+
+  /*
+   * The gradient is 200% wide:
+   *   left half  = orange (the fill)
+   *   right half = transparent (the default state)
+   * background-position: right → only the transparent half is visible.
+   * On hover/focus/active → shift to left → orange half shows.
+   */
+  background: linear-gradient(
+    to right,
+    hsl(33 100% 60%) 50%,
+    transparent       50%
+  );
+  background-size: 200% 100%;
+  background-position: right center;
+
+  /* Default text + border */
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.75);
+
+  /* ALL transitions in one place */
+  transition:
+    background-position 0.35s ease,
+    border-color        0.35s ease,
+    color               0.35s ease,
+    box-shadow          0.35s ease,
+    transform           0.1s  ease;
+
+  /* Typography */
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Filled state (hover / focus / tap) ── */
+.add-to-cart-pill:hover,
+.add-to-cart-pill:focus-visible,
+.add-to-cart-pill:active {
+  background-position: left center;  /* slide orange in */
+  border-color: hsl(33 100% 60%);
+  color: #000000;                    /* black text on orange */
+  box-shadow: 0 4px 24px hsl(33 100% 60% / 0.35);
+}
+
+.add-to-cart-pill:active {
+  transform: scale(0.97);
+}
+
+/* Keyboard focus ring */
+.add-to-cart-pill:focus-visible {
+  box-shadow: 0 0 0 3px hsl(33 100% 60% / 0.5);
+}
+
 /* Veg / Non-Veg food indicator icons — Zomato/Swiggy standard */
 .veg-icon {
   width: 18px;

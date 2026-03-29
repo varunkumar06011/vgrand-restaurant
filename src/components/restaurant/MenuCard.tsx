@@ -102,13 +102,13 @@ const MenuCard: React.FC<MenuCardProps> = ({ item }) => {
 
                 <div className="flex items-center justify-center gap-4">
                     {cartQty === 0 ? (
-                        /* Not in cart — show Add to Cart */
-                        <Button
+                        /* Not in cart — pill fill animation button */
+                        <button
                             onClick={handleAddToCart}
-                            className="w-full py-6 shadow-xl shadow-primary/10"
+                            className="add-to-cart-pill w-full"
                         >
                             Add to Cart
-                        </Button>
+                        </button>
                     ) : (
                         /* In cart — show synced +/- controls */
                         <div className="flex items-center gap-1 bg-white/5 border border-primary/40 rounded-full p-1 w-full justify-between">
