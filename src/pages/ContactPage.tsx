@@ -21,18 +21,18 @@ const ContactPage: React.FC = () => {
       <div className="relative h-[50vh] flex items-center justify-center overflow-hidden border-b border-white/5">
         <div className="absolute inset-0 bg-[url('https://miaoda-site-img.s3cdn.medo.dev/images/KLing_3e782de9-74f2-46b9-a3c6-d6c518bdd5c7.jpg')] bg-cover bg-fixed bg-center grayscale opacity-10" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-        <div className="relative z-10 text-center px-4">
+        <div className="relative z-10 text-center px-4 pt-16 sm:pt-0">
             <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="inline-block px-4 py-1 border border-primary text-primary text-xs uppercase tracking-[0.5em] font-bold mb-8"
+                className="inline-block px-3 py-1 border border-primary text-primary text-[10px] sm:text-xs uppercase tracking-[0.5em] font-bold mb-6 md:mb-8"
             >
                 V Grand Restaurant Legacy
             </motion.div>
             <motion.h1 
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-6xl md:text-9xl font-bold text-white uppercase tracking-tight leading-tight"
+                className="text-4xl sm:text-5xl md:text-8xl lg:text-9xl font-bold text-white uppercase tracking-tight leading-tight"
             >
                 The <span className="text-gold underline decoration-primary/20">Palace</span>
             </motion.h1>
@@ -54,7 +54,7 @@ const ContactPage: React.FC = () => {
               <div className="relative z-10 space-y-12">
                 <div className="space-y-4">
                     <h2 className="text-[10px] uppercase font-bold tracking-[0.4em] text-primary">Establishment Details</h2>
-                    <h3 className="text-5xl font-bold text-white uppercase tracking-tight leading-tight">Connect with <span className="text-gold">Grandeur</span></h3>
+                    <h3 className="text-3xl md:text-5xl font-bold text-white uppercase tracking-tight leading-tight">Connect with <span className="text-gold">Grandeur</span></h3>
                 </div>
 
                 <div className="space-y-8">
@@ -81,9 +81,9 @@ const ContactPage: React.FC = () => {
                         <Phone className="h-6 w-6 text-primary skew-x-[12deg]" />
                     </div>
                     <div className="space-y-4 flex-1">
-                      <div className="space-y-1">
+                      <div className="space-y-1 overflow-hidden">
                         <h4 className="text-[10px] uppercase font-bold tracking-widest text-white/40">Direct Communication</h4>
-                        <p className="text-3xl font-bold text-white tracking-tight leading-normal">+91 98765 43210</p>
+                        <p className="text-2xl sm:text-3xl font-bold text-white tracking-tight leading-normal break-all">+91 98765 43210</p>
                       </div>
                       <div className="flex gap-4">
                         <Button 
@@ -107,9 +107,9 @@ const ContactPage: React.FC = () => {
                     <div className="h-14 w-14 bg-white/5 border border-white/10 flex items-center justify-center skew-x-[-12deg] group-hover/item:border-primary/50 transition-all">
                         <Mail className="h-6 w-6 text-primary skew-x-[12deg]" />
                     </div>
-                    <div className="space-y-1">
+                    <div className="space-y-1 overflow-hidden">
                       <h4 className="text-[10px] uppercase font-bold tracking-widest text-white/40">Diplomatic Inquiries</h4>
-                      <p className="text-xl font-bold text-white tracking-tight lowercase underline decoration-primary/20">info@vgrandrestaurant.com</p>
+                      <p className="text-base sm:text-xl font-bold text-white tracking-tight lowercase underline decoration-primary/20 break-all">info@vgrandrestaurant.com</p>
                     </div>
                   </div>
 
