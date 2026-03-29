@@ -84,18 +84,18 @@ const MyOrdersPage: React.FC = () => {
       <div className="relative h-[45vh] flex items-center justify-center overflow-hidden border-b border-white/5">
         <div className="absolute inset-0 bg-[url('https://miaoda-site-img.s3cdn.medo.dev/images/KLing_3e782de9-74f2-46b9-a3c6-d6c518bdd5c7.jpg')] bg-cover bg-center grayscale opacity-10" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-        <div className="relative z-10 text-center px-4">
+        <div className="relative z-10 text-center px-4 pt-12 sm:pt-0">
             <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="inline-block px-4 py-1 border border-primary text-primary text-xs uppercase tracking-[0.5em] font-bold mb-8"
+                className="inline-block px-3 py-1 border border-primary text-primary text-[10px] uppercase tracking-[0.5em] font-bold mb-6 md:mb-8"
             >
                 Order Archives
             </motion.div>
             <motion.h1 
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-6xl md:text-9xl font-bold text-white uppercase tracking-tight leading-tight"
+                className="text-4xl sm:text-5xl md:text-8xl lg:text-9xl font-bold text-white uppercase tracking-tight leading-tight"
             >
                 My <span className="text-gold underline decoration-primary/20">History</span>
             </motion.h1>
@@ -107,7 +107,7 @@ const MyOrdersPage: React.FC = () => {
             <div className="space-y-8">
             <div className="flex items-center gap-4 mb-2">
                 <History className="h-6 w-6 text-primary" />
-                <h2 className="text-2xl font-bold uppercase tracking-tight text-white focus:outline-none">Track Your Legacy</h2>
+                <h2 className="text-xl md:text-2xl font-bold uppercase tracking-tight text-white focus:outline-none">Track Your Legacy</h2>
             </div>
             
             <div className="flex flex-col gap-6 lg:flex-row items-end">
@@ -129,7 +129,7 @@ const MyOrdersPage: React.FC = () => {
               <Button 
                 onClick={handleSearch} 
                 disabled={loading} 
-                className="h-16 px-12 shadow-xl shadow-primary/20 disabled:opacity-50 transition-all active:translate-y-1 active:shadow-none"
+                className="w-full sm:h-16 h-14 px-8 md:px-12 shadow-xl shadow-primary/20 disabled:opacity-50 transition-all active:translate-y-1 active:shadow-none"
               >
                 <span className="flex items-center gap-3">
                     <Search className="h-5 w-5" />

@@ -51,10 +51,10 @@ const TopNavigation: React.FC = () => {
                 className="relative"
             >
                 <div className="absolute inset-0 bg-primary blur-xl opacity-20 group-hover:opacity-40 transition-opacity" />
-                <img src="/logo.png" alt="V Grand Restaurant Logo" className="relative h-14 w-14 object-contain md:h-16 md:w-16 drop-shadow-2xl" />
+                <img src="/logo.png" alt="V Grand Restaurant Logo" className="relative h-12 w-12 md:h-16 md:w-16 object-contain drop-shadow-2xl" />
             </motion.div>
             <div className="flex flex-col">
-              <span className="text-xl font-black tracking-tighter md:text-3xl uppercase leading-none italic" style={{ color: 'var(--brand-red)' }}>
+              <span className="text-lg sm:text-xl font-black tracking-tighter md:text-3xl uppercase leading-none italic" style={{ color: 'var(--brand-red)' }}>
                 V GRAND <span className="text-white">RESTAURANT</span>
               </span>
             </div>

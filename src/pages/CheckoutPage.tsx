@@ -141,18 +141,18 @@ const CheckoutPage: React.FC = () => {
         <div className="relative h-[40vh] flex items-center justify-center overflow-hidden border-b border-white/5">
             <div className="absolute inset-0 bg-[url('https://miaoda-site-img.s3cdn.medo.dev/images/KLing_3e782de9-74f2-46b9-a3c6-d6c518bdd5c7.jpg')] bg-cover bg-center grayscale opacity-10" />
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-            <div className="relative z-10 text-center px-4">
+            <div className="relative z-10 text-center px-4 pt-12 sm:pt-0">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="inline-block px-4 py-1 border border-gold/30 text-gold text-xs uppercase tracking-[0.4em] font-black italic mb-6"
+                    className="inline-block px-3 py-1 border border-gold/30 text-gold text-[10px] uppercase tracking-[0.4em] font-black italic mb-4 md:mb-6"
                 >
                     Finalizing Protocol
                 </motion.div>
                 <motion.h1 
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-6xl md:text-8xl font-bold text-white uppercase tracking-tight leading-tight"
+                    className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-bold text-white uppercase tracking-tight leading-tight"
                 >
                     Checkout <span className="text-primary underline decoration-gold/30">Secure</span>
                 </motion.h1>
@@ -191,7 +191,7 @@ const CheckoutPage: React.FC = () => {
                             {/* Step 1: Cart Review */}
                             {step === 1 && (
                                 <div className="space-y-6">
-                                    <h2 className="text-4xl font-bold uppercase tracking-tight text-white mb-8 border-l-8 border-primary pl-6 leading-tight">Review Your Imperial Bag</h2>
+                                    <h2 className="text-2xl md:text-4xl font-bold uppercase tracking-tight text-white mb-8 border-l-8 border-primary pl-6 leading-tight">Review Your Imperial Bag</h2>
                                     <div className="space-y-4">
                                         {items.map(item => (
                                             <div key={item.id} className="flex gap-6 bg-card/30 backdrop-blur-3xl border border-white/5 p-6 group transition-all hover:border-primary/30 rounded-3xl">
@@ -203,9 +203,9 @@ const CheckoutPage: React.FC = () => {
                                                     />
                                                 </div>
                                                 <div className="flex flex-1 flex-col justify-center">
-                                                    <h4 className="text-xl font-bold uppercase tracking-tight text-white mb-2 group-hover:text-primary transition-colors">{item.name}</h4>
-                                                    <div className="flex items-center gap-6">
-                                                        <p className="text-sm font-black text-gold italic">₹{item.price}</p>
+                                                    <h4 className="text-lg md:text-xl font-bold uppercase tracking-tight text-white mb-1 group-hover:text-primary transition-colors">{item.name}</h4>
+                                                    <div className="flex items-center gap-4 md:gap-6">
+                                                        <p className="text-xs md:text-sm font-black text-gold italic">₹{item.price}</p>
                                                         <div className="flex items-center gap-1 bg-white/5 p-1 border border-white/10 rounded-full">
                                                             <Button
                                                                 variant="ghost"
@@ -227,8 +227,8 @@ const CheckoutPage: React.FC = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div className="flex flex-col justify-center items-end gap-3">
-                                                    <p className="text-2xl font-black text-white italic">₹{item.price * item.quantity}</p>
+                                                <div className="flex flex-col justify-center items-end gap-2 md:gap-3">
+                                                    <p className="text-xl md:text-2xl font-black text-white italic">₹{item.price * item.quantity}</p>
                                                     <button onClick={() => removeItem(item.id)} className="text-white/10 hover:text-red-500 transition-colors">
                                                         <Trash2 className="h-5 w-5" />
                                                     </button>
@@ -237,8 +237,8 @@ const CheckoutPage: React.FC = () => {
                                         ))}
                                     </div>
                                     <div className="flex justify-end pt-8">
-                                        <Button onClick={handleContinue} className="px-16 py-10 text-2xl shadow-xl shadow-primary/20">
-                                            <span className="flex items-center gap-3">Continue <ArrowLeft className="h-8 w-8 rotate-180" /></span>
+                                        <Button onClick={handleContinue} className="w-full sm:w-auto px-10 py-6 md:px-16 md:py-10 text-xl md:text-2xl shadow-xl shadow-primary/20">
+                                            <span className="flex items-center gap-3">Continue <ArrowLeft className="h-6 w-6 md:h-8 md:w-8 rotate-180" /></span>
                                         </Button>
                                     </div>
                                 </div>

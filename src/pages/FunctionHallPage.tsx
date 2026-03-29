@@ -89,7 +89,7 @@ const FunctionHallPage: React.FC = () => {
                     <div className="h-24 w-24 bg-primary flex items-center justify-center rounded-none skew-x-[-12deg] mb-10 shadow-[10px_10px_0_rgba(255,153,51,0.2)]">
                         <CheckCircle2 className="h-12 w-12 text-background skew-x-[12deg]" />
                     </div>
-                    <h2 className="text-5xl font-black text-white uppercase italic tracking-tighter mb-4 leading-none">Inquiry <span className="text-primary underline decoration-gold/30">Recorded</span></h2>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white uppercase italic tracking-tighter mb-4 leading-none">Inquiry <span className="text-primary underline decoration-gold/30">Recorded</span></h2>
                     <p className="text-white/40 uppercase tracking-[0.3em] text-[10px] font-black italic mb-12 max-w-md">
                         Our royal coordinators will consult the scrolls and reach out within 24 royal hours to confirm your banquet.
                     </p>
@@ -112,22 +112,22 @@ const FunctionHallPage: React.FC = () => {
       <div className="relative h-[60vh] flex items-center justify-center overflow-hidden border-b border-white/5">
         <div className="absolute inset-0 bg-[url('https://miaoda-site-img.s3cdn.medo.dev/images/KLing_37d5a87b-3a3d-433a-8297-145a55188950.jpg')] bg-cover bg-center grayscale opacity-20 scale-105" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-        <div className="relative z-10 text-center px-4">
+        <div className="relative z-10 text-center px-4 pt-20 sm:pt-0">
             <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="inline-block px-4 py-1 border border-primary text-primary text-xs uppercase tracking-[0.5em] font-black italic mb-8"
+                className="inline-block px-3 py-1 border border-primary text-primary text-[10px] uppercase tracking-[0.5em] font-black italic mb-6 md:mb-8"
             >
                 The Royal Venue
             </motion.div>
             <motion.h1 
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-6xl md:text-9xl font-black text-white uppercase italic tracking-tighter leading-none"
+                className="text-4xl sm:text-5xl md:text-8xl lg:text-9xl font-black text-white uppercase italic tracking-tighter leading-none"
             >
                 Grand <span className="text-gold italic underline decoration-primary/20">Banquet</span>
             </motion.h1>
-            <p className="mt-6 text-white/40 uppercase tracking-[0.4em] text-xs font-black italic">A stage for your most distinguished celebrations</p>
+            <p className="mt-4 md:mt-6 text-white/40 uppercase tracking-[0.4em] text-[10px] md:text-xs font-black italic">A stage for your most distinguished celebrations</p>
         </div>
       </div>
 
@@ -248,7 +248,7 @@ const FunctionHallPage: React.FC = () => {
             <Card className="bg-card p-10 border border-primary/20 rounded-none shadow-2xl relative overflow-hidden group">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent" />
                 <CardHeader className="px-0 pt-0 pb-10 border-b border-white/5 mb-10">
-                    <h2 className="text-3xl font-black text-white uppercase italic tracking-tighter flex items-center gap-3 italic">
+                    <h2 className="text-2xl md:text-3xl font-black text-white uppercase italic tracking-tighter flex items-center gap-3 italic">
                         Check <span className="text-primary underline decoration-gold/20">Availability</span>
                     </h2>
                     <p className="text-[10px] uppercase font-black tracking-widest text-white/30 mt-2">Consult the Palace Scribes</p>
