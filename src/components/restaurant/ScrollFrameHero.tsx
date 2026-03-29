@@ -190,19 +190,30 @@ export const ScrollFrameHero: React.FC = () => {
       style={{ height: config.scrollHeight }}
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden">
-        {/* Static poster image — shows INSTANTLY before any JS loads */}
+        {/* Static poster image — shows INSTANTLY before any JS loads.
+             Once frames are ready, it fades to opacity-0 so ONLY the canvas is visible. */}
         <img
           src={POSTER_FRAME}
           alt="V Grand Biryani"
-          className="absolute inset-0 h-full w-full object-cover opacity-80"
+          className="absolute inset-0 h-full w-full object-cover"
           fetchPriority="high"
+          style={{
+            opacity: loading ? 1 : 0,
+            transition: 'opacity 0.4s ease',
+            zIndex: 0,
+          }}
         />
 
-        {/* Canvas overlays the poster once frames are loaded and scroll begins */}
+        {/* Canvas — hidden until all frames are loaded, then fades in completely.
+             Never overlaps with the poster — one replaces the other. */}
         <canvas
           ref={canvasRef}
-          className="absolute inset-0 h-full w-full object-cover opacity-80"
-          style={{ zIndex: loading ? -1 : 1 }}
+          className="absolute inset-0 h-full w-full"
+          style={{
+            opacity: loading ? 0 : 1,
+            transition: 'opacity 0.4s ease',
+            zIndex: 1,
+          }}
         />
 
         {/* Overlay Content — z-10 ensures it's above poster + canvas */}
