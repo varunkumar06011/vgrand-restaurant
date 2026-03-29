@@ -4,6 +4,9 @@ import { useIsMobile } from '@/hooks/use-mobile';
 
 const TOTAL_FRAMES = 174;
 
+/** Last frame shown as instant poster — the complete biryani plate */
+const POSTER_FRAME = '/biriyani-frames/ezgif-frame-174.jpg';
+
 /**
  * Responsive scroll configuration.
  * Mobile uses much shorter scroll distance so users aren't "scroll-blocked".
@@ -140,7 +143,15 @@ export const ScrollFrameHero: React.FC = () => {
     context.drawImage(currentFrame, offsetX, offsetY, drawWidth, drawHeight);
   }, [images]);
 
-  // Subscribe to frame changes
+  // Draw the LAST frame immediately on load so users never see a blank screen
+  useEffect(() => {
+    if (loading || images.length === 0) return;
+
+    // Immediately draw the last frame (complete biryani) on load
+    drawFrame(images.length - 1);
+  }, [loading, images, drawFrame]);
+
+  // Subscribe to frame changes on scroll
   useEffect(() => {
     if (loading || images.length === 0) return;
 
@@ -179,20 +190,23 @@ export const ScrollFrameHero: React.FC = () => {
       style={{ height: config.scrollHeight }}
     >
       <div className="sticky top-0 h-screen w-full overflow-hidden">
-        {loading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background z-50">
-            <div className="text-secondary animate-pulse text-2xl font-serif">
-               Arranging the Royal Spices...
-            </div>
-          </div>
-        )}
-        <canvas
-          ref={canvasRef}
-          className="h-full w-full object-cover opacity-80"
+        {/* Static poster image — shows INSTANTLY before any JS loads */}
+        <img
+          src={POSTER_FRAME}
+          alt="V Grand Biryani"
+          className="absolute inset-0 h-full w-full object-cover opacity-80"
+          fetchPriority="high"
         />
 
-        {/* Overlay Content */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-center px-4">
+        {/* Canvas overlays the poster once frames are loaded and scroll begins */}
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 h-full w-full object-cover opacity-80"
+          style={{ zIndex: loading ? -1 : 1 }}
+        />
+
+        {/* Overlay Content — z-10 ensures it's above poster + canvas */}
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/40 text-center px-4">
             <motion.h1
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
