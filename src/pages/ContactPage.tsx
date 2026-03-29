@@ -64,10 +64,15 @@ const ContactPage: React.FC = () => {
                     </div>
                     <div className="space-y-1">
                       <h4 className="text-[10px] uppercase font-bold tracking-widest text-white/40">Royal Address</h4>
-                      <p className="text-xl font-bold text-white tracking-tight uppercase leading-tight">
+                      <a
+                        href="https://www.google.com/maps/search/?api=1&query=VGrand+Family+Restaurant+Ongole"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xl font-bold text-white tracking-tight uppercase leading-tight hover:text-primary transition-colors"
+                      >
                         Main Road, Ongole<br/>
                         <span className="text-white/40">Andhra Pradesh, India</span>
-                      </p>
+                      </a>
                     </div>
                   </div>
 
@@ -158,7 +163,7 @@ const ContactPage: React.FC = () => {
                 <div className="absolute bottom-10 right-10">
                     <Button
                     onClick={() =>
-                        window.open('https://www.google.com/maps/search/?api=1&query=Ongole,Andhra+Pradesh,India','_blank')
+                        window.open('https://www.google.com/maps/search/?api=1&query=VGrand+Family+Restaurant+Ongole','_blank')
                     }
                     className="h-14 px-8 shadow-2xl"
                     >

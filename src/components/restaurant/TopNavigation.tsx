@@ -57,9 +57,6 @@ const TopNavigation: React.FC = () => {
               <span className="text-xl font-black tracking-tighter md:text-3xl uppercase leading-none italic" style={{ color: 'var(--brand-red)' }}>
                 V GRAND <span className="text-white">RESTAURANT</span>
               </span>
-              <span className="text-[10px] tracking-[0.4em] text-gold uppercase font-bold opacity-80 decoration-primary underline-offset-4 underline">
-                Raja of Biryanis
-              </span>
             </div>
           </Link>
 

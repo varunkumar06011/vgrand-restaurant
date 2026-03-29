@@ -1,4 +1,5 @@
 /* stylelint-disable */
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,700&family=Figtree:wght@400;600;700;800;900&family=Archivo:ital,wght@0,400;0,600;0,700;0,900;1,700&family=Bricolage+Grotesque:wght@400;600;700;800&family=Cormorant:ital,wght@0,400;0,600;1,400;1,600&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -72,12 +73,32 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Figtree', 'Poppins', sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-bold tracking-tight;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Lora', serif;
+  }
+
+  /* Single-line hero headlines use Figtree */
+  .font-headline {
+    font-family: 'Figtree', sans-serif;
+  }
+
+  /* Menu item names use Archivo */
+  .font-menu {
+    font-family: 'Archivo', sans-serif;
+  }
+
+  /* Buttons use Bricolage Grotesque */
+  button, [role="button"], .btn {
+    font-family: 'Bricolage Grotesque', sans-serif;
+  }
+
+  /* Reviews use Cormorant */
+  .font-review {
+    font-family: 'Cormorant', serif;
   }
 
   h1 { 

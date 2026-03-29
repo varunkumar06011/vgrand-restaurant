@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Search, X } from 'lucide-react';
 import { useDebounce } from '@/hooks/use-debounce';
 
@@ -72,14 +71,14 @@ const FilterBar: React.FC<FilterBarProps> = ({ onFilterChange }) => {
             size="sm"
             onClick={() => setIsVeg(isVeg === true ? null : true)}
           >
-            🥗 Veg
+            Veg
           </Button>
           <Button
             variant={isVeg === false ? 'default' : 'outline'}
             size="sm"
             onClick={() => setIsVeg(isVeg === false ? null : false)}
           >
-            🍖 Non-Veg
+            Non-Veg
           </Button>
           <Button
             variant={sortBy === 'price_asc' ? 'default' : 'outline'}

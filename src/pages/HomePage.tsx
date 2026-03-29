@@ -39,7 +39,7 @@ const HomePage: React.FC = () => {
       </div>
 
       {/* Featured Section with staggered reveal */}
-      <section className="relative z-20 -mt-20">
+      <section className="relative z-20">
         <FeaturedBiryanis />
       </section>
 

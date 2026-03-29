@@ -44,7 +44,7 @@ const CartSummary: React.FC<CartSummaryProps> = ({ showActions = true, deliveryF
                 <ShoppingBag className="h-5 w-5 text-primary" />
              </div>
              <span className="text-2xl font-black uppercase italic tracking-tighter text-white">
-                Royal Bag
+                Your Stomach
              </span>
           </div>
           <Badge variant="outline" className="border-primary/30 text-primary rounded-none bg-primary/5 font-black italic">

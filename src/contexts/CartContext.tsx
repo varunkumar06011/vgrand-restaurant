@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { toast } from 'sonner';
 import type { CartItem } from '@/types/restaurant';
 
 interface CartContextType {
@@ -23,13 +24,28 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     sessionStorage.setItem('cart', JSON.stringify(items));
   }, [items]);
 
+  const CART_ITEM_LIMIT = 5;
+
   const addItem = (item: CartItem) => {
     setItems(prev => {
       const existing = prev.find(i => i.id === item.id);
       if (existing) {
+        const newQty = existing.quantity + item.quantity;
+        if (newQty > CART_ITEM_LIMIT) {
+          toast.error(`Max ${CART_ITEM_LIMIT} of the same item allowed!`, {
+            style: { background: '#1A1A1A', color: '#FF4444', border: '1px solid #FF4444' }
+          });
+          return prev;
+        }
         return prev.map(i =>
-          i.id === item.id ? { ...i, quantity: i.quantity + item.quantity } : i
+          i.id === item.id ? { ...i, quantity: newQty } : i
         );
+      }
+      if (item.quantity > CART_ITEM_LIMIT) {
+        toast.error(`Max ${CART_ITEM_LIMIT} of the same item allowed!`, {
+          style: { background: '#1A1A1A', color: '#FF4444', border: '1px solid #FF4444' }
+        });
+        return [...prev, { ...item, quantity: CART_ITEM_LIMIT }];
       }
       return [...prev, item];
     });
@@ -42,6 +58,12 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const updateQuantity = (itemId: string, quantity: number) => {
     if (quantity <= 0) {
       removeItem(itemId);
+      return;
+    }
+    if (quantity > CART_ITEM_LIMIT) {
+      toast.error(`Max ${CART_ITEM_LIMIT} of the same item allowed!`, {
+        style: { background: '#1A1A1A', color: '#FF4444', border: '1px solid #FF4444' }
+      });
       return;
     }
     setItems(prev =>

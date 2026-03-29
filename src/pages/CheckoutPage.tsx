@@ -250,7 +250,7 @@ const CheckoutPage: React.FC = () => {
                                     <h2 className="text-4xl font-bold uppercase tracking-tight text-white mb-8 border-l-8 border-primary pl-6 leading-tight">Service Protocol</h2>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                                         <div className="space-y-4">
-                                            <Label className="text-xs uppercase tracking-[0.3em] font-black text-gold/60">Full Name</Label>
+                                            <Label className="text-xs uppercase tracking-[0.3em] font-black text-gold/60">King/Queen Name</Label>
                                             <div className="relative">
                                                 <User className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
                                                 <Input
@@ -262,7 +262,7 @@ const CheckoutPage: React.FC = () => {
                                             </div>
                                         </div>
                                         <div className="space-y-4">
-                                            <Label className="text-xs uppercase tracking-[0.3em] font-black text-gold/60">Communication Line</Label>
+                                            <Label className="text-xs uppercase tracking-[0.3em] font-black text-gold/60">Can I get your number</Label>
                                             <div className="relative">
                                                 <Phone className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
                                                 <Input
@@ -275,7 +275,7 @@ const CheckoutPage: React.FC = () => {
                                             </div>
                                         </div>
                                         <div className="space-y-4 md:col-span-2">
-                                            <Label className="text-xs uppercase tracking-[0.3em] font-black text-gold/60">Imperial Email (Optional)</Label>
+                                            <Label className="text-xs uppercase tracking-[0.3em] font-black text-gold/60">Your Email (Optional)</Label>
                                             <div className="relative">
                                                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
                                                 <Input
@@ -288,7 +288,7 @@ const CheckoutPage: React.FC = () => {
                                             </div>
                                         </div>
                                         <div className="space-y-4 md:col-span-2">
-                                            <Label className="text-xs uppercase tracking-[0.3em] font-black text-gold/60">Palace/Delivery Address</Label>
+                                            <Label className="text-xs uppercase tracking-[0.3em] font-black text-gold/60">Where can I meet you with order</Label>
                                             <div className="relative">
                                                 <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-primary" />
                                                 <Input

@@ -4,6 +4,7 @@ import IntersectObserver from '@/components/common/IntersectObserver';
 import { Toaster } from '@/components/ui/sonner';
 import { CartProvider } from '@/contexts/CartContext';
 import MainLayout from '@/components/layouts/MainLayout';
+import ScrollToTop from '@/components/common/ScrollToTop';
 
 import routes from './routes';
 
@@ -11,6 +12,7 @@ const App: React.FC = () => {
   return (
     <Router>
       <CartProvider>
+        <ScrollToTop />
         <IntersectObserver />
         <MainLayout>
           <Routes>

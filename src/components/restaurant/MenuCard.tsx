@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Minus, Plus, Flame, Sparkles } from 'lucide-react';
+import { Minus, Plus, Sparkles } from 'lucide-react';
 import type { MenuItem } from '@/types/restaurant';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
@@ -30,7 +30,7 @@ const MenuCard: React.FC<MenuCardProps> = ({ item }) => {
     setQuantity(1);
   };
 
-  const incrementQuantity = () => setQuantity(prev => prev + 1);
+  const incrementQuantity = () => setQuantity(prev => Math.min(5, prev + 1));
   const decrementQuantity = () => setQuantity(prev => Math.max(1, prev - 1));
 
   return (
@@ -81,17 +81,6 @@ const MenuCard: React.FC<MenuCardProps> = ({ item }) => {
                     )}
                 </div>
 
-                {/* Spice indicators */}
-                {item.spice_level > 0 && (
-                <div className="absolute bottom-4 left-4 flex gap-1 bg-black/40 backdrop-blur-md p-1.5 border border-white/10 rounded-full">
-                    {Array.from({ length: 3 }).map((_, i) => (
-                    <Flame 
-                        key={i} 
-                        className={`h-3 w-3 ${i < item.spice_level ? 'text-primary fill-primary' : 'text-white/20'}`} 
-                    />
-                    ))}
-                </div>
-                )}
             </div>
 
             <div className="p-6 relative">
@@ -101,7 +90,7 @@ const MenuCard: React.FC<MenuCardProps> = ({ item }) => {
                 </div>
 
                 <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-2xl font-bold uppercase tracking-tight text-white group-hover:text-primary transition-colors">
+                    <h3 className="font-menu text-2xl font-bold uppercase tracking-tight text-white group-hover:text-primary transition-colors">
                         {item.name}
                     </h3>
                     <div className="text-2xl font-bold text-gold">
