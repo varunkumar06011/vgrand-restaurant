@@ -13,12 +13,15 @@ interface MenuCardProps {
 }
 
 const MenuCard: React.FC<MenuCardProps> = ({ item }) => {
-  const [quantity, setQuantity] = useState(1);
   const [isHovered, setIsHovered] = useState(false);
-  const { addItem } = useCart();
+  const { items, addItem, updateQuantity } = useCart();
+
+  // Derive quantity directly from cart — single source of truth
+  const cartItem = items.find(i => i.id === item.id);
+  const cartQty = cartItem ? cartItem.quantity : 0;
 
   const handleAddToCart = () => {
-    addItem({ ...item, quantity });
+    addItem({ ...item, quantity: 1 });
     toast.success(`${item.name} added to your royal feast!`, {
         icon: <Sparkles className="h-4 w-4 text-primary" />,
         style: {
@@ -27,11 +30,10 @@ const MenuCard: React.FC<MenuCardProps> = ({ item }) => {
             border: '1px solid #FF9933'
         }
     });
-    setQuantity(1);
   };
 
-  const incrementQuantity = () => setQuantity(prev => Math.min(5, prev + 1));
-  const decrementQuantity = () => setQuantity(prev => Math.max(1, prev - 1));
+  const handleIncrement = () => updateQuantity(item.id, cartQty + 1);
+  const handleDecrement = () => updateQuantity(item.id, cartQty - 1);
 
   return (
     <motion.div
@@ -71,13 +73,9 @@ const MenuCard: React.FC<MenuCardProps> = ({ item }) => {
                         </Badge>
                     )}
                     {!item.is_veg ? (
-                        <Badge className="bg-red-600 text-white font-black uppercase italic tracking-tighter rounded-none text-[10px] px-3">
-                           Royal Non-Veg
-                        </Badge>
+                        <span className="nonveg-icon" title="Non-Vegetarian" />
                     ) : (
-                        <Badge className="bg-green-600 text-white font-bold uppercase tracking-wide rounded-full text-[10px] px-3">
-                            Royal Veg
-                        </Badge>
+                        <span className="veg-icon" title="Vegetarian" />
                     )}
                 </div>
 
@@ -102,33 +100,37 @@ const MenuCard: React.FC<MenuCardProps> = ({ item }) => {
                     {item.description || 'A masterpiece of authentic Andhra spices and premium ingredients.'}
                 </p>
 
-                <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-1 bg-white/5 p-1 border border-white/10 rounded-full">
+                <div className="flex items-center justify-center gap-4">
+                    {cartQty === 0 ? (
+                        /* Not in cart — show Add to Cart */
                         <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 hover:bg-primary hover:text-background transition-colors rounded-full"
-                            onClick={decrementQuantity}
+                            onClick={handleAddToCart}
+                            className="w-full py-6 shadow-xl shadow-primary/10"
                         >
-                            <Minus className="h-4 w-4" />
+                            Add to Cart
                         </Button>
-                        <span className="w-8 text-center font-bold text-primary">{quantity}</span>
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 hover:bg-primary hover:text-background transition-colors rounded-full"
-                            onClick={incrementQuantity}
-                        >
-                            <Plus className="h-4 w-4" />
-                        </Button>
-                    </div>
-
-                    <Button 
-                        onClick={handleAddToCart} 
-                        className="flex-1 py-6 shadow-xl shadow-primary/10"
-                    >
-                        Order Now
-                    </Button>
+                    ) : (
+                        /* In cart — show synced +/- controls */
+                        <div className="flex items-center gap-1 bg-white/5 border border-primary/40 rounded-full p-1 w-full justify-between">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 hover:bg-primary hover:text-background transition-colors rounded-full"
+                                onClick={handleDecrement}
+                            >
+                                <Minus className="h-4 w-4" />
+                            </Button>
+                            <span className="w-8 text-center font-bold text-primary">{cartQty}</span>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 hover:bg-primary hover:text-background transition-colors rounded-full"
+                                onClick={handleIncrement}
+                            >
+                                <Plus className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    )}
                 </div>
             </div>
         </Card>

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { getBestsellerItems } from '@/db/api';
 import type { MenuItem } from '@/types/restaurant';
+import { Minus, Plus } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -12,7 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 const FeaturedBiryanis: React.FC = () => {
   const [items, setItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const { addItem } = useCart();
+  const { items: cartItems, addItem, updateQuantity } = useCart();
 
   useEffect(() => {
     loadBestsellerItems();
@@ -33,6 +34,11 @@ const FeaturedBiryanis: React.FC = () => {
   const handleAddToCart = (item: MenuItem) => {
     addItem({ ...item, quantity: 1 });
     toast.success(`${item.name} added to cart!`);
+  };
+
+  const getCartQty = (itemId: string) => {
+    const found = cartItems.find(i => i.id === itemId);
+    return found ? found.quantity : 0;
   };
 
   if (loading) {
@@ -82,22 +88,44 @@ const FeaturedBiryanis: React.FC = () => {
                       Bestseller
                     </Badge>
                   )}
-                  {!item.is_veg && (
-                    <Badge variant="destructive" className="absolute left-2 top-2">
-                      Non-Veg
-                    </Badge>
-                  )}
+                  <span
+                    className={item.is_veg ? 'veg-icon' : 'nonveg-icon'}
+                    title={item.is_veg ? 'Vegetarian' : 'Non-Vegetarian'}
+                    style={{ position: 'absolute', left: '10px', top: '10px' }}
+                  />
                 </div>
                 <CardContent className="p-4">
                   <h3 className="mb-2 text-lg font-semibold text-foreground">{item.name}</h3>
                   <p className="mb-3 line-clamp-2 text-sm text-muted-foreground">
                     {item.description}
                   </p>
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-3">
                     <span className="text-xl font-bold text-secondary">₹{item.price}</span>
-                    <Button onClick={() => handleAddToCart(item)} size="lg" className="shadow-lg">
-                      Order Now
-                    </Button>
+                    {getCartQty(item.id) === 0 ? (
+                      <Button onClick={() => handleAddToCart(item)} size="sm" className="shadow-lg">
+                        Add to Cart
+                      </Button>
+                    ) : (
+                      <div className="flex items-center gap-1 bg-white/5 border border-primary/40 rounded-full p-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 hover:bg-primary hover:text-background transition-colors rounded-full"
+                          onClick={() => updateQuantity(item.id, getCartQty(item.id) - 1)}
+                        >
+                          <Minus className="h-3 w-3" />
+                        </Button>
+                        <span className="w-7 text-center font-bold text-primary text-sm">{getCartQty(item.id)}</span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7 w-7 hover:bg-primary hover:text-background transition-colors rounded-full"
+                          onClick={() => updateQuantity(item.id, getCartQty(item.id) + 1)}
+                        >
+                          <Plus className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

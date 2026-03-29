@@ -150,17 +150,23 @@ const ContactPage: React.FC = () => {
             <Card className="bg-white/2 border-white/5 rounded-[2rem] overflow-hidden relative h-[450px] shadow-2xl">
                 <div className="absolute inset-0 grayscale contrast-125 brightness-50">
                     <iframe
-                    src="https://www.google.com/maps/embed/v1/place?key=AIzaSyB_LJOYJL-84SMuxNB7LtRGhxEQLjswvy0&q=Ongole,Andhra+Pradesh,India&language=en&region=in"
+                    src="https://www.google.com/maps/embed/v1/place?key=AIzaSyB_LJOYJL-84SMuxNB7LtRGhxEQLjswvy0&q=VGrand+Family+Restaurant+Ongole&language=en&region=in"
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}
                     allowFullScreen
                     loading="lazy"
-                    title="Palace Location"
+                    title="VGrand Family Restaurant Location"
                     />
                 </div>
+                {/* Clickable overlay — opens Google Maps on click */}
+                <div
+                    className="absolute inset-0 cursor-pointer z-10"
+                    onClick={() => window.open('https://www.google.com/maps/search/?api=1&query=VGrand+Family+Restaurant+Ongole', '_blank')}
+                    title="Open in Google Maps"
+                />
                 <div className="absolute inset-0 pointer-events-none border-[20px] border-background/20" />
-                <div className="absolute bottom-10 right-10">
+                <div className="absolute bottom-10 right-10 z-20">
                     <Button
                     onClick={() =>
                         window.open('https://www.google.com/maps/search/?api=1&query=VGrand+Family+Restaurant+Ongole','_blank')

@@ -136,3 +136,52 @@ All colors MUST be HSL.
     }
   }
 }
+
+/* Veg / Non-Veg food indicator icons — Zomato/Swiggy standard */
+.veg-icon {
+  width: 18px;
+  height: 18px;
+  background: #ffffff;
+  border: 2px solid #16a34a;
+  border-radius: 2px;
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.veg-icon::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  background: #16a34a;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.nonveg-icon {
+  width: 18px;
+  height: 18px;
+  background: #ffffff;
+  border: 2px solid #dc2626;
+  border-radius: 2px;
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.nonveg-icon::after {
+  content: "";
+  width: 0;
+  height: 0;
+  border-left: 4.5px solid transparent;
+  border-right: 4.5px solid transparent;
+  border-bottom: 8px solid #dc2626;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -46%);
+}
+
