@@ -1,13 +1,51 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'motion/react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const TOTAL_FRAMES = 174;
+
+/**
+ * Responsive scroll configuration.
+ * Mobile uses much shorter scroll distance so users aren't "scroll-blocked".
+ * Desktop retains the full cinematic experience.
+ */
+const SCROLL_CONFIG = {
+  desktop: {
+    scrollHeight: '400vh',   // 4x viewport — premium cinematic scroll
+    stiffness: 100,          // Smooth, cinematic spring
+    damping: 30,
+    frameStep: 1,            // Load every frame (174 total)
+  },
+  mobile: {
+    scrollHeight: '180vh',   // ~1.8x viewport — quick, not frustrating
+    stiffness: 200,          // Snappier response for touch
+    damping: 25,
+    frameStep: 2,            // Load every 2nd frame (87 total) — saves bandwidth
+  },
+} as const;
 
 export const ScrollFrameHero: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [images, setImages] = useState<HTMLImageElement[]>([]);
   const [loading, setLoading] = useState(true);
+  const isMobile = useIsMobile();
+
+  // Pick config based on screen size
+  const config = isMobile ? SCROLL_CONFIG.mobile : SCROLL_CONFIG.desktop;
+
+  // Determine which frames to load
+  const frameIndices = useMemo(() => {
+    const indices: number[] = [];
+    for (let i = 1; i <= TOTAL_FRAMES; i += config.frameStep) {
+      indices.push(i);
+    }
+    // Always include the last frame for a clean ending
+    if (indices[indices.length - 1] !== TOTAL_FRAMES) {
+      indices.push(TOTAL_FRAMES);
+    }
+    return indices;
+  }, [config.frameStep]);
 
   // Scroll tracking
   const { scrollYProgress } = useScroll({
@@ -15,100 +53,131 @@ export const ScrollFrameHero: React.FC = () => {
     offset: ["start start", "end end"]
   });
 
-  // Smooth the scroll progress
+  // Smooth the scroll progress — snappier on mobile
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
+    stiffness: config.stiffness,
+    damping: config.damping,
     restDelta: 0.001
   });
 
-  // Map progress (0-1) to frame index (1-174)
-  const frameIndex = useTransform(smoothProgress, [0, 1], [1, TOTAL_FRAMES]);
+  // Map progress (0-1) to index in the loaded frames array
+  const frameArrayIndex = useTransform(
+    smoothProgress,
+    [0, 1],
+    [0, frameIndices.length - 1]
+  );
 
-  // Preload images
+  // Preload images (respects frameStep — mobile loads fewer)
   useEffect(() => {
     let loadedCount = 0;
     const loadedImages: HTMLImageElement[] = [];
+    let cancelled = false;
 
-    for (let i = 1; i <= TOTAL_FRAMES; i++) {
-        const img = new Image();
-        const frameNum = String(i).padStart(3, '0');
-        img.src = `/biriyani-frames/ezgif-frame-${frameNum}.jpg`;
-        img.onload = () => {
-            loadedCount++;
-            if (loadedCount === TOTAL_FRAMES) {
-                setLoading(false);
-            }
-        };
-        loadedImages.push(img);
-    }
-    setImages(loadedImages);
-  }, []);
+    const totalToLoad = frameIndices.length;
 
-  // Draw frame to canvas
-  useEffect(() => {
-    if (loading || images.length === 0 || !canvasRef.current) return;
-
-    const unsubscribe = frameIndex.on('change', (latest) => {
-        const index = Math.floor(latest) - 1;
-        const currentFrame = images[index];
-        if (currentFrame && canvasRef.current) {
-            const context = canvasRef.current.getContext('2d');
-            if (context) {
-                // Clear and draw
-                context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-                
-                // Maintain aspect ratio (assuming images are 16:9 or similar)
-                const canvasAspect = canvasRef.current.width / canvasRef.current.height;
-                const imgAspect = currentFrame.width / currentFrame.height;
-                
-                let drawWidth = canvasRef.current.width;
-                let drawHeight = canvasRef.current.height;
-                let offsetX = 0;
-                let offsetY = 0;
-
-                if (canvasAspect > imgAspect) {
-                    drawHeight = drawWidth / imgAspect;
-                    offsetY = (canvasRef.current.height - drawHeight) / 2;
-                } else {
-                    drawWidth = drawHeight * imgAspect;
-                    offsetX = (canvasRef.current.width - drawWidth) / 2;
-                }
-
-                context.drawImage(currentFrame, offsetX, offsetY, drawWidth, drawHeight);
-            }
+    for (const frameNum of frameIndices) {
+      const img = new Image();
+      const padded = String(frameNum).padStart(3, '0');
+      img.src = `/biriyani-frames/ezgif-frame-${padded}.jpg`;
+      img.onload = () => {
+        if (cancelled) return;
+        loadedCount++;
+        if (loadedCount === totalToLoad) {
+          setLoading(false);
         }
+      };
+      img.onerror = () => {
+        if (cancelled) return;
+        loadedCount++;
+        if (loadedCount === totalToLoad) {
+          setLoading(false);
+        }
+      };
+      loadedImages.push(img);
+    }
+
+    setImages(loadedImages);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [frameIndices]);
+
+  // Draw current frame to canvas
+  const drawFrame = React.useCallback((index: number) => {
+    const canvas = canvasRef.current;
+    if (!canvas || images.length === 0) return;
+
+    const clampedIndex = Math.min(
+      Math.max(Math.floor(index), 0),
+      images.length - 1
+    );
+    const currentFrame = images[clampedIndex];
+    if (!currentFrame || !currentFrame.complete || !currentFrame.naturalWidth) return;
+
+    const context = canvas.getContext('2d');
+    if (!context) return;
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Cover-fit the image (like object-fit: cover)
+    const canvasAspect = canvas.width / canvas.height;
+    const imgAspect = currentFrame.width / currentFrame.height;
+
+    let drawWidth = canvas.width;
+    let drawHeight = canvas.height;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    if (canvasAspect > imgAspect) {
+      drawHeight = drawWidth / imgAspect;
+      offsetY = (canvas.height - drawHeight) / 2;
+    } else {
+      drawWidth = drawHeight * imgAspect;
+      offsetX = (canvas.width - drawWidth) / 2;
+    }
+
+    context.drawImage(currentFrame, offsetX, offsetY, drawWidth, drawHeight);
+  }, [images]);
+
+  // Subscribe to frame changes
+  useEffect(() => {
+    if (loading || images.length === 0) return;
+
+    const unsubscribe = frameArrayIndex.on('change', (latest) => {
+      drawFrame(latest);
     });
 
     return () => unsubscribe();
-  }, [loading, images, frameIndex]);
+  }, [loading, images, frameArrayIndex, drawFrame]);
 
   // Handle window resize for canvas
   useEffect(() => {
     const handleResize = () => {
-        if (canvasRef.current) {
-            canvasRef.current.width = window.innerWidth;
-            canvasRef.current.height = window.innerHeight;
-            
-            // Re-draw current frame
-            const index = Math.floor(frameIndex.get()) - 1;
-            const currentFrame = images[index];
-            if (currentFrame) {
-                const context = canvasRef.current.getContext('2d');
-                if (context) {
-                    context.drawImage(currentFrame, 0, 0, canvasRef.current.width, canvasRef.current.height);
-                }
-            }
-        }
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      // Re-draw current frame after resize
+      if (images.length > 0) {
+        const currentIdx = frameArrayIndex.get();
+        drawFrame(currentIdx);
+      }
     };
 
     window.addEventListener('resize', handleResize);
     handleResize();
     return () => window.removeEventListener('resize', handleResize);
-  }, [images, frameIndex]);
+  }, [images, frameArrayIndex, drawFrame]);
 
   return (
-    <div ref={containerRef} className="relative h-[400vh] w-full bg-background">
+    <div
+      ref={containerRef}
+      className="relative w-full bg-background"
+      style={{ height: config.scrollHeight }}
+    >
       <div className="sticky top-0 h-screen w-full overflow-hidden">
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-background z-50">
@@ -117,14 +186,14 @@ export const ScrollFrameHero: React.FC = () => {
             </div>
           </div>
         )}
-        <canvas 
-          ref={canvasRef} 
+        <canvas
+          ref={canvasRef}
           className="h-full w-full object-cover opacity-80"
         />
-        
+
         {/* Overlay Content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 text-center px-4">
-            <motion.h1 
+            <motion.h1
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8 }}
@@ -133,17 +202,17 @@ export const ScrollFrameHero: React.FC = () => {
             >
                 Raja of <span className="text-primary">Biryanis</span>
             </motion.h1>
-            <motion.p 
+            <motion.p
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
                 transition={{ delay: 0.4, duration: 0.8 }}
                 className="text-lg md:text-2xl text-gold max-w-2xl font-medium tracking-wide"
             >
-                Deconstructing the essence of authentic Andhra spices. 
+                Deconstructing the essence of authentic Andhra spices.
                 Experience the cinematic assembly of royalty.
             </motion.p>
-            
-            <motion.div 
+
+            <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 }}
@@ -151,7 +220,7 @@ export const ScrollFrameHero: React.FC = () => {
             >
                 <div className="flex flex-col items-center gap-4">
                     <span className="text-muted-foreground uppercase tracking-[0.3em] text-xs">Scroll to Assemble</span>
-                    <motion.div 
+                    <motion.div
                         animate={{ y: [0, 10, 0] }}
                         transition={{ repeat: Infinity, duration: 2 }}
                         className="h-12 w-[2px] bg-gradient-to-b from-primary to-transparent"
