@@ -1,9 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-// @ts-ignore
 import { supabase } from '@/db/supabase';
 import type { User } from '@supabase/supabase-js';
-// @ts-ignore
-import type { Profile } from '@/types/types';
+import type { Profile } from '@/types/auth';
 import { toast } from 'sonner';
 
 export async function getProfile(userId: string): Promise<Profile | null> {
@@ -78,7 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithUsername = async (username: string, password: string) => {
     try {
-      const email = `${username}@miaoda.com`;
+      const email = username.includes('@') ? username : `${username}@miaoda.com`;
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -93,7 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUpWithUsername = async (username: string, password: string) => {
     try {
-      const email = `${username}@miaoda.com`;
+      const email = username.includes('@') ? username : `${username}@miaoda.com`;
       const { error } = await supabase.auth.signUp({
         email,
         password,

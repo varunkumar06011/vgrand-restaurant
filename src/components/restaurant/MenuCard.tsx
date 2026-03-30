@@ -14,11 +14,15 @@ interface MenuCardProps {
 
 const MenuCard: React.FC<MenuCardProps> = ({ item }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [hasImageError, setHasImageError] = useState(false);
   const { items, addItem, updateQuantity } = useCart();
 
   // Derive quantity directly from cart — single source of truth
   const cartItem = items.find(i => i.id === item.id);
   const cartQty = cartItem ? cartItem.quantity : 0;
+
+  // Premium Fallback URL (Branded Placeholder)
+  const fallbackUrl = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&q=20'; // Stylized food bowl
 
   const handleAddToCart = () => {
     addItem({ ...item, quantity: 1 });
@@ -47,10 +51,11 @@ const MenuCard: React.FC<MenuCardProps> = ({ item }) => {
     >
         <Card className="group overflow-hidden bg-card border-white/5 hover:border-primary/50 transition-all duration-500 rounded-3xl shadow-2xl">
             <div className="relative h-64 overflow-hidden">
-                {/* Image with zoom effect */}
+                {/* Image with zoom effect and error handling */}
                 <motion.img
-                    src={item.image_url || 'placeholder-food.jpg'}
+                    src={hasImageError ? fallbackUrl : (item.image_url || fallbackUrl)}
                     alt={item.name}
+                    onError={() => setHasImageError(true)}
                     animate={{ scale: isHovered ? 1.1 : 1 }}
                     transition={{ duration: 0.8 }}
                     className="h-full w-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all"
