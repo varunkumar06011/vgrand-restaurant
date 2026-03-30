@@ -1,10 +1,11 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import { supabase } from '@/db/supabase';
+import { supabase, isConfigured } from '@/db/supabase';
 import type { User } from '@supabase/supabase-js';
 import type { Profile } from '@/types/auth';
 import { toast } from 'sonner';
 
 export async function getProfile(userId: string): Promise<Profile | null> {
+  if (!isConfigured) return null;
   const { data, error } = await supabase
     .from('profiles')
     .select('*')
@@ -12,7 +13,7 @@ export async function getProfile(userId: string): Promise<Profile | null> {
     .maybeSingle();
 
   if (error) {
-    console.error('获取用户信息失败:', error);
+    console.error('Failed to get user profile:', error);
     return null;
   }
   return data;
@@ -45,24 +46,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    if (!isConfigured) {
+      setLoading(false);
+      return;
+    }
+
     supabase
       .auth
       .getSession()
-      .then(({ data: { session } }) => {
+      .then(({ data: { session } }: { data: { session: any } }) => {
         setUser(session?.user ?? null);
         if (session?.user) {
           getProfile(session.user.id).then(setProfile);
         }
       })
-      .catch(error => {
-        toast.error(`获取用户信息失败: ${error.message}`);
+      .catch((error: any) => {
+        toast.error(`Failed to get session: ${error.message}`);
       })
       .finally(() => {
         setLoading(false);
       });
 
-    // In this function, do NOT use any await calls. Use `.then()` instead to avoid deadlocks.
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
       setUser(session?.user ?? null);
       if (session?.user) {
         getProfile(session.user.id).then(setProfile);
@@ -105,6 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
+    if (!isConfigured) return;
     await supabase.auth.signOut();
     setUser(null);
     setProfile(null);
