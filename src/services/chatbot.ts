@@ -264,8 +264,8 @@ export const chatbotService = {
       return { unsubscribe: () => {} };
     }
 
-    const safeChannel = `res_sh_${reservationId.substring(0, 8)}`;
-    console.log(`[Chatbot] Subscribing to: ${safeChannel} (ID: ${reservationId})`);
+    const safeChannel = `table_res_sync_${reservationId.substring(0, 8)}`;
+    console.log(`[Chatbot] GLOBAL Subscribing to: ${safeChannel} (ID: ${reservationId})`);
     
     return supabase
       .channel(safeChannel)
@@ -274,28 +274,33 @@ export const chatbotService = {
         {
           event: 'UPDATE',
           schema: 'public',
-          table: 'table_reservations',
-          filter: `id=eq.${reservationId}`
+          table: 'table_reservations'
+          // We remove the server side filter here to ensure the update reaches the client
         },
         (payload) => {
-          console.log("[Chatbot] Realtime event received:", payload.new.status);
-          const status = (payload.new.status || '').toLowerCase();
+          console.log("[Chatbot] GLOBAL UPDATE RECEIVED:", payload.new.id, "looking for:", reservationId);
           
-          if (status.includes('confirm')) {
-            console.log("[Chatbot] SUCCESS: Match found, triggering UI update!");
-            onUpdate({
-              ...payload.new,
-              notification_payload: {
-                title: "V GRAND OFFICIAL",
-                body: `Hey king/queen! your status is approved ✅ we will make things ready in mean while. See you soon!`,
-                type: 'whatsapp'
-              }
-            });
+          // CRITICAL: Manual Match in JS
+          if (payload.new.id === reservationId) {
+            console.log("[Chatbot] MATCH FOUND! Status:", payload.new.status);
+            const status = (payload.new.status || '').toLowerCase();
+            
+            if (status.includes('confirm')) {
+              console.log("[Chatbot] SUCCESS: Approval detected! Updating UI...");
+              onUpdate({
+                ...payload.new,
+                notification_payload: {
+                  title: "V GRAND OFFICIAL",
+                  body: `Hey king/queen! your status is approved ✅ we will make things ready in mean while. See you soon!`,
+                  type: 'whatsapp'
+                }
+              });
+            }
           }
         }
       )
       .subscribe((status) => {
-        console.log(`[Chatbot] Subscription status for ${reservationId}:`, status);
+        console.log(`[Chatbot] Subscription status:`, status);
       });
   },
 };
