@@ -129,7 +129,8 @@ export const chatbotService = {
         };
 
       case 'collecting_food_details':
-        if (cleanMessage.length > 2) {
+        // Filter out short/junk inputs like 'X', '.', 'ok'
+        if (cleanMessage.length > 3 && !['done', 'yes', 'no'].includes(lowerMessage)) {
           const newItem = cleanMessage.substring(0, 100);
           data.basket = [...(data.basket || []), newItem];
           return {
@@ -205,7 +206,11 @@ export const chatbotService = {
                 customer_phone: data.phone,
                 num_people: data.num_people,
                 booking_time: new Date().toISOString(), 
-                items: data.basket,
+                // CRITICAL: Map strings to objects for Admin Dash compatibility
+                items: (data.basket || []).map((name: string) => ({ 
+                  name, 
+                  quantity: 1 
+                })),
                 status: 'pending_approval'
               })
               .select('*')
