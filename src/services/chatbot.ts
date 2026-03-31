@@ -284,14 +284,15 @@ export const chatbotService = {
           event: 'UPDATE',
           schema: 'public',
           table: 'table_reservations',
+          filter: `id=eq.${reservationId}`
         },
         (payload) => {
-          if (payload.new.id === reservationId && payload.new.status === 'confirmed') {
+          if (payload.new.status === 'confirmed') {
             onUpdate({
               ...payload.new,
               notification_payload: {
                 title: "V GRAND OFFICIAL",
-                body: `Hi king/queen! Your payment is approved ✅ and your table (Order No: ${payload.new.token_number}) is officially confirmed! We have made things ready and your items are being prepared. See you soon!`,
+                body: `Your booking is confirmed! See you soon! ✅`,
                 type: 'whatsapp'
               }
             });
