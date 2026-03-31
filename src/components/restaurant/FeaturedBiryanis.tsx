@@ -3,12 +3,13 @@ import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { getBestsellerItems } from '@/db/api';
+import { supabase } from '@/db/supabase';
 import type { MenuItem } from '@/types/restaurant';
 import { Minus, Plus } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
+import { OptimizedImage } from '@/components/OptimizedImage';
 
 const FeaturedBiryanis: React.FC = () => {
   const [items, setItems] = useState<MenuItem[]>([]);
@@ -21,8 +22,25 @@ const FeaturedBiryanis: React.FC = () => {
 
   const loadBestsellerItems = async () => {
     try {
-      const data = await getBestsellerItems();
-      setItems(data || []);
+      if (!supabase) {
+        setItems([]);
+        return;
+      }
+
+      // Home page Signature Biryanis section should only show biryani category
+      const { data, error } = await supabase
+        .from('menu_items')
+        .select('*')
+        .eq('category', 'biryani')
+        .eq('is_available', true)
+        .eq('is_bestseller', true)
+        .limit(6);
+
+      if (error || !data) {
+        setItems([]);
+      } else {
+        setItems(data);
+      }
     } catch (error) {
       console.error('Failed to load bestseller items:', error);
       setItems([]);
@@ -77,11 +95,10 @@ const FeaturedBiryanis: React.FC = () => {
             items.map(item => (
               <Card key={item.id} className="group overflow-hidden bg-card/40 border-white/5 hover:border-primary/50 transition-all duration-500 rounded-none relative">
                 <div className="relative h-64 overflow-hidden">
-                  <img
-                    src={item.image_url || 'placeholder-biryani.jpg'}
+                  <OptimizedImage
+                    src={item.image_url}
                     alt={item.name}
                     className="h-full w-full object-cover transition-transform group-hover:scale-105"
-                    loading="lazy"
                   />
                   {item.is_bestseller && (
                     <Badge className="absolute right-2 top-2 bg-secondary text-secondary-foreground">
@@ -131,8 +148,10 @@ const FeaturedBiryanis: React.FC = () => {
               </Card>
             ))
           ) : (
-            <div className="col-span-full py-8 text-center text-muted-foreground">
-              No bestseller items available
+            <div className="col-span-full py-24 text-center border-2 border-dashed border-white/5">
+              <p className="text-2xl font-black uppercase italic text-white/20 tracking-tighter">
+                No items available
+              </p>
             </div>
           )}
         </div>

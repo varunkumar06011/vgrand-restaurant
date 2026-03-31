@@ -156,7 +156,7 @@ const MenuPage: React.FC = () => {
                             className="py-24 text-center border-2 border-dashed border-white/5"
                         >
                             <p className="text-2xl font-black uppercase italic text-white/20 tracking-tighter">
-                                No Royal Delicacies Found
+                                No items available
                             </p>
                         </motion.div>
                       ) : (
