@@ -97,6 +97,7 @@ export const chatbotService = {
           data.num_people = count;
           return {
             reply: `OK, ${data.num_people} people. Which date? (e.g. Tomorrow)`,
+            type: "date_picker",
             state: { stage: 'collecting_date', data: data }
           };
         }
@@ -110,6 +111,7 @@ export const chatbotService = {
         if (pastKeywords.some(word => lowerMessage.includes(word))) {
           return {
             reply: "The V Grand Scribes cannot book for the past! Please choose Today, Tomorrow, or a future date.",
+            type: "date_picker",
             state: { stage: 'collecting_date', data: data }
           };
         }

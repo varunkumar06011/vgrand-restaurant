@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MessageCircle, X, Send, Loader2, RotateCcw, Smartphone, Clock, ChevronLeft, Trash2, CreditCard } from 'lucide-react';
+import { X, Send, RotateCcw, Smartphone, Clock, ChevronLeft, CreditCard, Calendar as CalendarIcon } from 'lucide-react';
 import { chatbotService, ChatMessage, ChatSession } from '@/services/chatbot';
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 
@@ -22,6 +25,8 @@ const ChatWidget: React.FC = () => {
   const [session, setSession] = useState<ChatSession>({ stage: 'idle', data: {} });
   const [showHistory, setShowHistory] = useState(false);
   const [history, setHistory] = useState<SavedChat[]>([]);
+  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const subscriptionRef = useRef<any>(null);
@@ -117,6 +122,7 @@ const ChatWidget: React.FC = () => {
         role: 'assistant',
         content: response.reply,
         options: response.options,
+        type: response.type,
       };
       setMessages((prev) => [...prev, assistantMessage]);
       setSession(response.state);
@@ -140,6 +146,13 @@ const ChatWidget: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleDateSelect = (selectedDate: Date | undefined) => {
+    if (!selectedDate) return;
+    setDate(selectedDate);
+    const formatted = format(selectedDate, "PPP");
+    handleSend(formatted);
   };
 
   const handlePayment = async (data: any) => {
@@ -307,9 +320,47 @@ const ChatWidget: React.FC = () => {
                 autoComplete="off"
                 tabIndex={-1}
               />
-              <div className="relative">
-                <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSend()} placeholder={isLoading ? "Processing..." : "Ask..."} className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 sm:py-4 pl-4 sm:pl-6 pr-14 text-sm text-white focus:border-rose-500/50 transition-all font-sans" />
-                <button onClick={() => handleSend()} disabled={isLoading || !input.trim()} className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white"><Send size={18} /></button>
+              <div className="relative flex items-center gap-2">
+                {session?.stage === 'collecting_date' && (
+                  <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                    <PopoverTrigger asChild>
+                      <button 
+                        onClick={() => setIsCalendarOpen(true)}
+                        className="w-12 h-12 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-lg shrink-0 group"
+                      >
+                        <CalendarIcon size={20} className="group-hover:scale-110 transition-transform" />
+                      </button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0 bg-[#1A1A1A] border-white/10 shadow-2xl z-[10000]" align="start" side="top" sideOffset={12}>
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        onSelect={handleDateSelect}
+                        disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}
+                        initialFocus
+                        className="bg-transparent text-white"
+                        classNames={{
+                          day_selected: "bg-rose-500 text-white hover:bg-rose-600 rounded-lg",
+                          day_today: "border border-rose-500/50 text-rose-500 font-bold",
+                          head_cell: "text-white/40 font-black uppercase text-[10px] tracking-widest p-2",
+                          cell: "text-center text-sm p-1 relative",
+                          day: "h-9 w-9 p-0 font-bold text-white/90 hover:bg-white/10 rounded-lg transition-colors flex items-center justify-center",
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                )}
+                <div className="relative flex-1">
+                  <input 
+                    type="text" 
+                    value={input} 
+                    onChange={(e) => setInput(e.target.value)} 
+                    onKeyPress={(e) => e.key === 'Enter' && handleSend()} 
+                    placeholder={isLoading ? "Processing..." : "Ask..."} 
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 sm:py-4 pl-4 sm:pl-6 pr-14 text-sm text-white focus:border-rose-500/50 transition-all font-sans" 
+                  />
+                  <button onClick={() => handleSend()} disabled={isLoading || !input.trim()} className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white"><Send size={18} /></button>
+                </div>
               </div>
             </div>
           </motion.div>
