@@ -8,7 +8,8 @@ import {
   LogOut,
   Menu,
   X,
-  AlertTriangle
+  AlertTriangle,
+  CalendarDays
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -16,6 +17,7 @@ import { cn } from '@/lib/utils';
 const navItems = [
   { name: 'Dashboard', path: '/admin', icon: LayoutDashboard },
   { name: 'Orders', path: '/admin/orders', icon: ShoppingBag },
+  { name: 'Reservations', path: '/admin/reservations', icon: CalendarDays },
   { name: 'Products', path: '/admin/products', icon: UtensilsCrossed },
   { name: 'Payments', path: '/admin/payments', icon: CreditCard },
 ];

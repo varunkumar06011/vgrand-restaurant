@@ -2,12 +2,14 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import IntersectObserver from '@/components/common/IntersectObserver';
 import { Toaster } from '@/components/ui/sonner';
+import { toast } from 'sonner';
 import { CartProvider } from '@/contexts/CartContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import MainLayout from '@/components/layouts/MainLayout';
 import ScrollToTop from '@/components/common/ScrollToTop';
 import { isConfigured } from '@/db/supabase';
 import { AlertCircle, Terminal, RefreshCcw } from 'lucide-react';
+import ChatWidget from '@/components/chatbot/ChatWidget';
 
 import routes from './routes';
 
@@ -67,10 +69,21 @@ const ConfigError: React.FC = () => {
   );
 };
 
+const isDev = import.meta.env.DEV;
+
 const App: React.FC = () => {
-  if (!isConfigured) {
+  if (!isConfigured && !isDev) {
     return <ConfigError />;
   }
+
+  React.useEffect(() => {
+    if (!isConfigured && isDev) {
+      toast.error("V Grand: Running in Mock Mode (Keys Missing)", {
+        description: "The UI is active for testing, but data features require Supabase keys.",
+        duration: 10000,
+      });
+    }
+  }, []);
 
   return (
     <Router>
@@ -99,6 +112,7 @@ const App: React.FC = () => {
             } />
           </Routes>
           <Toaster />
+          <ChatWidget />
         </CartProvider>
       </AuthProvider>
     </Router>

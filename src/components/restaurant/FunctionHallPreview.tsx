@@ -17,7 +17,7 @@ const FunctionHallPreview: React.FC = () => {
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2 h-64 overflow-hidden rounded-lg">
               <img
-                src="https://miaoda-site-img.s3cdn.medo.dev/images/KLing_37d5a87b-3a3d-433a-8297-145a55188950.jpg"
+                src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=1600&auto=format&fit=crop"
                 alt="Function Hall Main View"
                 className="h-full w-full object-cover"
                 loading="lazy"
@@ -25,7 +25,7 @@ const FunctionHallPreview: React.FC = () => {
             </div>
             <div className="h-48 overflow-hidden rounded-lg">
               <img
-                src="https://miaoda-site-img.s3cdn.medo.dev/images/KLing_74e25857-4a4f-4849-b0cd-f12ac0ad54bf.jpg"
+                src="https://images.unsplash.com/photo-1505236858219-8359eb29e329?q=80&w=1600&auto=format&fit=crop"
                 alt="Function Hall Interior"
                 className="h-full w-full object-cover"
                 loading="lazy"
@@ -33,7 +33,7 @@ const FunctionHallPreview: React.FC = () => {
             </div>
             <div className="h-48 overflow-hidden rounded-lg">
               <img
-                src="https://miaoda-site-img.s3cdn.medo.dev/images/KLing_e1969d65-5557-48e6-8659-8aa6e68f8031.jpg"
+                src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=1600&auto=format&fit=crop"
                 alt="Function Hall Setup"
                 className="h-full w-full object-cover"
                 loading="lazy"

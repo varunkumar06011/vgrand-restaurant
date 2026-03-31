@@ -8,6 +8,7 @@ const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 const Orders = React.lazy(() => import('./pages/Orders'));
 const Products = React.lazy(() => import('./pages/Products'));
 const Payments = React.lazy(() => import('./pages/Payments'));
+const Reservations = React.lazy(() => import('./pages/Reservations'));
 const Login = React.lazy(() => import('./pages/Login'));
 
 const AdminApp: React.FC = () => {
@@ -25,6 +26,7 @@ const AdminApp: React.FC = () => {
             <Route path="orders" element={<Orders />} />
             <Route path="products" element={<Products />} />
             <Route path="payments" element={<Payments />} />
+            <Route path="reservations" element={<Reservations />} />
             <Route path="*" element={<Navigate to="/admin" replace />} />
           </Route>
         </Routes>

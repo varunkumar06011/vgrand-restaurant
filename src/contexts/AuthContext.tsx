@@ -80,6 +80,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signInWithUsername = async (username: string, password: string) => {
+    // Dev Bypass: allow admin login if Supabase is not configured
+    if (!isConfigured) {
+      const isUserEmail = username === 'kirankumarchowdary637@gmail.com';
+      const isAdminLogin = username === 'admin' && password === 'admin';
+      
+      if (isUserEmail || isAdminLogin) {
+        const mockUser = {
+          id: 'mock-admin-id',
+          email: isUserEmail ? username : 'admin@vgrand.com',
+          app_metadata: {},
+          user_metadata: {},
+          aud: 'authenticated',
+          created_at: new Date().toISOString(),
+        } as User;
+        
+        const mockProfile: Profile = {
+          id: 'mock-admin-id',
+          name: isUserEmail ? 'Kiran Kumar' : 'Royal Administrator',
+          email: isUserEmail ? username : 'admin@vgrand.com',
+          role: 'admin',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        };
+
+        setUser(mockUser);
+        setProfile(mockProfile);
+        return { error: null };
+      }
+    }
+
     try {
       const email = username.includes('@') ? username : `${username}@miaoda.com`;
       const { error } = await supabase.auth.signInWithPassword({

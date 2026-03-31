@@ -78,7 +78,7 @@ const FunctionHallPage: React.FC = () => {
   if (submitted) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://miaoda-site-img.s3cdn.medo.dev/images/KLing_37d5a87b-3a3d-433a-8297-145a55188950.jpg')] bg-cover bg-center grayscale opacity-10" />
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=1600&auto=format&fit=crop')] bg-cover bg-center grayscale opacity-10" />
         <motion.div 
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -110,7 +110,7 @@ const FunctionHallPage: React.FC = () => {
     <div className="min-h-screen bg-transparent pb-32">
       {/* Cinematic Header */}
       <div className="relative h-[60vh] flex items-center justify-center overflow-hidden border-b border-white/5">
-        <div className="absolute inset-0 bg-[url('https://miaoda-site-img.s3cdn.medo.dev/images/KLing_37d5a87b-3a3d-433a-8297-145a55188950.jpg')] bg-cover bg-center grayscale opacity-20 scale-105" />
+        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=1600&auto=format&fit=crop')] bg-cover bg-center grayscale opacity-20 scale-105" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
         <div className="relative z-10 text-center px-4 pt-20 sm:pt-0">
             <motion.div
@@ -142,7 +142,7 @@ const FunctionHallPage: React.FC = () => {
             >
                 <div className="aspect-video overflow-hidden border border-white/10 skew-x-[-2deg] group relative">
                     <img
-                        src="https://miaoda-site-img.s3cdn.medo.dev/images/KLing_37d5a87b-3a3d-433a-8297-145a55188950.jpg"
+                        src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=1600&auto=format&fit=crop"
                         alt="Function Hall Main View"
                         className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110 grayscale group-hover:grayscale-0"
                     />
@@ -156,9 +156,10 @@ const FunctionHallPage: React.FC = () => {
                 
                 <div className="grid grid-cols-3 gap-6">
                     {[
-                        "https://miaoda-site-img.s3cdn.medo.dev/images/KLing_74e25857-4a4f-4849-b0cd-f12ac0ad54bf.jpg",
-                        "https://miaoda-site-img.s3cdn.medo.dev/images/KLing_e1969d65-5557-48e6-8659-8aa6e68f8031.jpg",
-                        "https://miaoda-site-img.s3cdn.medo.dev/images/KLing_fe5656a8-baf8-4bba-b0c3-0095f3c14a40.jpg"
+                        "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?q=80&w=1600&auto=format&fit=crop",
+                        "https://images.unsplash.com/photo-1505236858219-8359eb29e329?q=80&w=1600&auto=format&fit=crop",
+                        "https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?q=80&w=1600&auto=format&fit=crop",
+                        "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1600&auto=format&fit=crop"
                     ].map((src, i) => (
                         <div key={i} className="h-40 overflow-hidden border border-white/5 skew-x-[-2deg] group">
                             <img src={src} alt="Hall setups" className="h-full w-full object-cover grayscale brightness-50 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-500 scale-105 group-hover:scale-100" />

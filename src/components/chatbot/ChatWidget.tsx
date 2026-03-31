@@ -1,0 +1,303 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { MessageCircle, X, Send, Loader2, RotateCcw, Smartphone, Clock, ChevronLeft, Trash2, CreditCard } from 'lucide-react';
+import { chatbotService, ChatMessage, ChatSession } from '@/services/chatbot';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
+
+interface SavedChat {
+  id: string;
+  timestamp: string;
+  messages: ChatMessage[];
+  session: ChatSession;
+  summary: string;
+}
+
+const ChatWidget: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [session, setSession] = useState<ChatSession>({ stage: 'idle', data: {} });
+  const [showHistory, setShowHistory] = useState(false);
+  const [history, setHistory] = useState<SavedChat[]>([]);
+  
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const subscriptionRef = useRef<any>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isLoading]);
+
+  useEffect(() => {
+    const savedHistory = localStorage.getItem('vgrand_chat_history');
+    if (savedHistory) setHistory(JSON.parse(savedHistory));
+
+    const currentSession = localStorage.getItem('vgrand_current_chat');
+    if (currentSession) {
+      const parsed = JSON.parse(currentSession);
+      setMessages(parsed.messages);
+      setSession(parsed.session);
+      
+      if (parsed.session.stage === 'awaiting_approval' && parsed.session.data?.reservation_id) {
+        startApprovalSubscription(parsed.session.data.reservation_id);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem('vgrand_current_chat', JSON.stringify({ messages, session }));
+    }
+  }, [messages, session]);
+
+  const saveToHistory = () => {
+    if (messages.length < 2) return;
+    const summary = session.data?.basket?.length > 0 
+      ? `Booking: ${session.data.basket.length} items for ${session.data.num_people || '?'}`
+      : messages[0]?.content.substring(0, 30) + "...";
+
+    const newChat = { id: Date.now().toString(), timestamp: new Date().toLocaleString(), messages, session, summary };
+    const newHistory = [newChat, ...history].slice(0, 10);
+    setHistory(newHistory);
+    localStorage.setItem('vgrand_chat_history', JSON.stringify(newHistory));
+  };
+
+  const loadFromHistory = (chat: SavedChat) => {
+    saveToHistory();
+    setMessages(chat.messages);
+    setSession(chat.session);
+    setShowHistory(false);
+    toast.success("Conversation restored");
+    if (chat.session.stage === 'awaiting_approval' && chat.session.data?.reservation_id) {
+        startApprovalSubscription(chat.session.data.reservation_id);
+    }
+  };
+
+  const startApprovalSubscription = (reservationId: string) => {
+    if (subscriptionRef.current) subscriptionRef.current.unsubscribe();
+    subscriptionRef.current = chatbotService.subscribeToReservation(reservationId, (updatedRes: any) => {
+      if (updatedRes.status === 'confirmed') {
+        toast.success("SMS Notification Sent! 📱", { duration: 5000 });
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          role: 'assistant',
+          type: 'notification',
+          content: updatedRes.notification_payload?.body || "Confirmed! ✅"
+        }]);
+      }
+    });
+  };
+
+  const handleSend = async (overrideInput?: string) => {
+    const textToSend = overrideInput || input;
+    if (!textToSend.trim() || isLoading) return;
+
+    const userMessage: ChatMessage = { id: Date.now().toString(), role: 'user', content: textToSend };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput('');
+    setIsLoading(true);
+
+    try {
+      const response = await chatbotService.sendMessage(textToSend, messages, session);
+      const assistantMessage: ChatMessage = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: response.reply,
+        options: response.options,
+      };
+      setMessages((prev) => [...prev, assistantMessage]);
+      setSession(response.state);
+
+      // Handle Automatic Payment Trigger
+      if (response.state.stage === 'awaiting_payment') {
+          handlePayment(response.state.data);
+      }
+
+      if (response.state.stage === 'awaiting_approval' && response.state.data?.reservation_id) {
+          startApprovalSubscription(response.state.data.reservation_id);
+      }
+    } catch (error) {
+      toast.error('Connection trouble. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handlePayment = async (data: any) => {
+    setIsLoading(true);
+    try {
+      const paymentData = await chatbotService.initiatePayment(data);
+      const scriptRes = await new Promise((resolve) => {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.onload = () => resolve(true);
+        script.onerror = () => resolve(false);
+        document.body.appendChild(script);
+      });
+
+      if (!scriptRes) {
+        toast.error('Razorpay SDK failed. Check your internet.');
+        return;
+      }
+
+      const options = {
+        key: paymentData.key_id,
+        amount: paymentData.amount,
+        currency: 'INR',
+        name: 'V Grand Gourmet Guide',
+        order_id: paymentData.order_id,
+        handler: async () => {
+          setMessages(prev => [...prev, { id: Date.now().toString(), role: 'user', content: "done" }]);
+          const response = await chatbotService.sendMessage("done", messages, session);
+          setMessages((prev) => [...prev, { id: Date.now().toString(), role: 'assistant', content: response.reply, options: response.options }]);
+          setSession(response.state);
+          if (response.state.data?.reservation_id) startApprovalSubscription(response.state.data.reservation_id);
+        },
+        prefill: { contact: data.phone },
+        theme: { color: '#E11D48' },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      toast.error('Payment window failed to open. Click the "Pay" button.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed top-24 right-6 z-[9999] font-sans">
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            className="mb-4 w-[380px] h-[580px] bg-[#1A1A1A] border border-white/10 rounded-[32px] shadow-2xl flex flex-col overflow-hidden backdrop-blur-xl relative"
+          >
+            {/* Header */}
+            <div className="p-6 bg-gradient-to-r from-rose-500/10 to-orange-500/10 border-b border-white/10 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {showHistory ? (
+                   <button onClick={() => setShowHistory(false)} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-all">
+                     <ChevronLeft size={18} />
+                   </button>
+                ) : (
+                    <div className="w-10 h-10 bg-white/5 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden border border-white/10">
+                      <img src="/chatbot-logo.png" alt="Logo" className="w-full h-full object-cover scale-110" />
+                    </div>
+                )}
+                <div>
+                  <h3 className="text-white font-bold text-sm tracking-tight">
+                    {showHistory ? 'History' : 'Gourmet Guide'}
+                  </h3>
+                  <p className="text-rose-500 text-[10px] font-bold uppercase tracking-widest">
+                    {showHistory ? `${history.length} Saved` : 'Restaurant AI'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {!showHistory && (
+                  <>
+                    <button onClick={() => setShowHistory(true)} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-rose-500 transition-all">
+                      <Clock size={16} />
+                    </button>
+                    <button onClick={() => { saveToHistory(); setMessages([]); setSession({ stage: 'idle', data: { basket: [] } }); localStorage.removeItem('vgrand_current_chat'); toast.success('New Chat Started'); }} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-rose-500 transition-all">
+                      <RotateCcw size={16} />
+                    </button>
+                  </>
+                )}
+                <button onClick={() => setIsOpen(false)} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-all">
+                  <X size={16} />
+                </button>
+              </div>
+            </div>
+
+            {/* History Overlay */}
+            <AnimatePresence>
+                {showHistory && (
+                    <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} className="absolute inset-x-0 bottom-0 top-[89px] bg-[#1A1A1A] z-20 flex flex-col p-6 space-y-4 overflow-y-auto">
+                        {history.length === 0 ? (
+                            <div className="flex-1 flex flex-col items-center justify-center text-center text-white/20">
+                                <Clock size={40} className="mb-4 opacity-10" />
+                                <p className="text-sm">No past conversations yet.</p>
+                            </div>
+                        ) : (
+                            history.map((chat) => (
+                                <button key={chat.id} onClick={() => loadFromHistory(chat)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-left hover:bg-white/[0.08] transition-all group">
+                                    <p className="text-rose-500 text-[10px] font-black uppercase tracking-widest mb-1">{chat.timestamp}</p>
+                                    <p className="text-white/90 text-sm font-bold line-clamp-1">{chat.summary}</p>
+                                </button>
+                            ))
+                        )}
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-hide">
+              {messages.map((msg) => (
+                <div key={msg.id} className={cn("flex flex-col gap-2", msg.role === 'user' ? 'items-end' : 'items-start')}>
+                  {msg.type === 'notification' ? (
+                     <div className="w-full p-4 bg-green-500/10 border border-green-500/20 rounded-2xl flex flex-col gap-2">
+                        <div className="flex items-center gap-2 text-green-500 text-[10px] font-black uppercase tracking-widest"><Smartphone size={12} /> Official Confirmation</div>
+                        <p className="text-white/90 text-sm leading-relaxed">{msg.content}</p>
+                     </div>
+                  ) : (
+                    <div className={cn("max-w-[80%] p-4 rounded-2xl text-sm", msg.role === 'user' ? 'bg-rose-500 text-white rounded-tr-none' : 'bg-white/5 text-white/90 border border-white/10 rounded-tl-none')}>
+                      {msg.content}
+                    </div>
+                  )}
+
+                  {msg.role === 'assistant' && msg.options && msg.options.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {msg.options.map((opt) => {
+                        const isPayment = opt.includes('Payment');
+                        return (
+                          <button
+                            key={opt}
+                            onClick={() => isPayment ? handlePayment(session.data) : handleSend(opt)}
+                            className={cn(
+                                "px-3 py-1.5 rounded-lg text-xs transition-all font-bold flex items-center gap-2",
+                                isPayment 
+                                    ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20 hover:scale-105" 
+                                    : "bg-white/5 border border-white/10 text-rose-500 hover:bg-rose-500 hover:text-white"
+                            )}
+                          >
+                            {isPayment && <CreditCard size={12} />}
+                            {session.stage === 'collecting_food_details' && !isPayment ? `[+] ${opt}` : opt}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Input */}
+            <div className="p-6 bg-black/40 border-t border-white/10 shrink-0">
+              <div className="relative">
+                <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSend()} placeholder={isLoading ? "Processing..." : "Ask anything..."} className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-6 pr-14 text-sm text-white focus:border-rose-500/50 transition-all font-sans" />
+                <button onClick={() => handleSend()} disabled={isLoading || !input.trim()} className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white"><Send size={18} /></button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <motion.button onClick={() => setIsOpen(!isOpen)} animate={{ y: [0, -10, 0], scale: [1, 1.05, 1], boxShadow: ["0 20px 40px -15px rgba(225, 29, 72, 0.4)", "0 30px 60px -15px rgba(225, 29, 72, 0.6)", "0 20px 40px -15px rgba(225, 29, 72, 0.4)"] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} className="w-16 h-16 bg-white rounded-[22px] flex items-center justify-center shadow-2xl border-2 border-white/20 overflow-hidden">
+        <img src="/chatbot-logo.png" alt="Chat" className="w-full h-full object-cover scale-110" />
+      </motion.button>
+    </div>
+  );
+};
+
+export default ChatWidget;

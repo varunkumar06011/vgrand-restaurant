@@ -10,7 +10,7 @@ const OrderSuccessPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6 overflow-hidden relative">
       {/* Background Decorative Elements */}
-      <div className="absolute inset-0 bg-[url('https://miaoda-site-img.s3cdn.medo.dev/images/KLing_3e782de9-74f2-46b9-a3c6-d6c518bdd5c7.jpg')] bg-cover bg-center grayscale opacity-5" />
+      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=1600&auto=format&fit=crop')] bg-cover bg-center grayscale opacity-5" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[120px] opacity-20" />
 
       <div className="relative z-10 w-full max-w-2xl">

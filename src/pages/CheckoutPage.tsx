@@ -139,7 +139,7 @@ const CheckoutPage: React.FC = () => {
     <div className="min-h-screen bg-background pb-32">
         {/* Cinematic Header */}
         <div className="relative h-[40vh] flex items-center justify-center overflow-hidden border-b border-white/5">
-            <div className="absolute inset-0 bg-[url('https://miaoda-site-img.s3cdn.medo.dev/images/KLing_3e782de9-74f2-46b9-a3c6-d6c518bdd5c7.jpg')] bg-cover bg-center grayscale opacity-10" />
+            <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=1600&auto=format&fit=crop')] bg-cover bg-center grayscale opacity-10" />
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
             <div className="relative z-10 text-center px-4 pt-12 sm:pt-0">
                 <motion.div

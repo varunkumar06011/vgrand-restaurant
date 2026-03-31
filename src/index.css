@@ -125,6 +125,15 @@ All colors MUST be HSL.
     animation: steam 3s ease-in-out infinite;
   }
 
+  .bounce-subtle {
+    animation: bounce-subtle 2s infinite ease-in-out;
+  }
+
+  @keyframes bounce-subtle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+
   @keyframes steam {
     0%, 100% {
       opacity: 0.3;
@@ -186,7 +195,6 @@ All colors MUST be HSL.
   white-space: nowrap;
 
   cursor: pointer;
-  outline: none;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
