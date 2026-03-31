@@ -17,6 +17,7 @@ const ChatWidget: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
+  const [honeypot, setHoneypot] = useState(''); // Bot protection
   const [isLoading, setIsLoading] = useState(false);
   const [session, setSession] = useState<ChatSession>({ stage: 'idle', data: {} });
   const [showHistory, setShowHistory] = useState(false);
@@ -96,6 +97,13 @@ const ChatWidget: React.FC = () => {
   const handleSend = async (overrideInput?: string) => {
     const textToSend = overrideInput || input;
     if (!textToSend.trim() || isLoading) return;
+
+    // Bot Honeypot Check
+    if (honeypot.length > 0) {
+      console.warn("Bot detected via honeypot trigger.");
+      toast.error("Spam protection triggered. Please refresh.");
+      return;
+    }
 
     const userMessage: ChatMessage = { id: Date.now().toString(), role: 'user', content: textToSend };
     setMessages((prev) => [...prev, userMessage]);
@@ -284,6 +292,15 @@ const ChatWidget: React.FC = () => {
 
             {/* Input */}
             <div className="p-6 bg-black/40 border-t border-white/10 shrink-0">
+              {/* Bot Honeypot - Hidden from humans */}
+              <input 
+                type="text" 
+                value={honeypot} 
+                onChange={(e) => setHoneypot(e.target.value)} 
+                className="hidden" 
+                autoComplete="off"
+                tabIndex={-1}
+              />
               <div className="relative">
                 <input type="text" value={input} onChange={(e) => setInput(e.target.value)} onKeyPress={(e) => e.key === 'Enter' && handleSend()} placeholder={isLoading ? "Processing..." : "Ask anything..."} className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-6 pr-14 text-sm text-white focus:border-rose-500/50 transition-all font-sans" />
                 <button onClick={() => handleSend()} disabled={isLoading || !input.trim()} className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white"><Send size={18} /></button>

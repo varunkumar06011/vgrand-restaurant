@@ -30,10 +30,25 @@ export function formatDate(
   date: Date | string | number,
   opts: Intl.DateTimeFormatOptions = {}
 ) {
-  return new Intl.DateTimeFormat("zh-CN", {
+  return new Intl.DateTimeFormat("en-US", {
     month: opts.month ?? "long",
     day: opts.day ?? "numeric",
     year: opts.year ?? "numeric",
     ...opts,
   }).format(new Date(date));
+}
+
+/**
+ * Basic sanitization to prevent common XSS patterns.
+ * In a real production app, use DOMPurify on the client or an XSS library on the server.
+ */
+export function sanitizeInput(input: string): string {
+  if (!input) return "";
+  return input
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
+    .replace(/\//g, "&#47;")
+    .trim();
 }

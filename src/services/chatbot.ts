@@ -1,4 +1,18 @@
 import { supabase } from '@/db/supabase';
+import { z } from 'zod';
+import { sanitizeInput } from '@/lib/utils';
+
+// Strict Validation Schemas
+const ReservationDataSchema = z.object({
+  num_people: z.number().min(1).max(20).optional(),
+  date: z.string().min(1).max(50).optional(),
+  time: z.string().min(1).max(50).optional(),
+  phone: z.string().regex(/^\d{10}$/, "Must be 10 digits").optional(),
+  basket: z.array(z.string().min(1).max(100)).default([]),
+  current_dietary: z.enum(['veg', 'non-veg']).optional(),
+  reservation_id: z.string().optional(),
+  token_number: z.number().optional(),
+});
 
 export interface ChatMessage {
   id: string;
@@ -37,8 +51,21 @@ export const chatbotService = {
 
   // v4.6 Production-Ready Logic (Stuck-Fix Edition)
   async localSimulateResponse(message: string, _history: ChatMessage[], sessionState: ChatSession) {
-    const lowerMessage = message.toLowerCase();
-    const data = sessionState?.data ? { ...sessionState.data } : { basket: [] };
+    const rawMessage = message || "";
+    const lowerMessage = rawMessage.toLowerCase();
+    
+    // Sanitize input
+    const cleanMessage = sanitizeInput(rawMessage);
+    
+    // Validate session data or initialize
+    let data: any;
+    try {
+      data = ReservationDataSchema.parse(sessionState?.data || { basket: [] });
+    } catch (e) {
+      console.warn("Invalid session state detected, resetting safety defaults", e);
+      data = { basket: [] };
+    }
+
     const currentStage = sessionState?.stage || 'idle';
 
     // Global Reset
@@ -72,14 +99,14 @@ export const chatbotService = {
         };
 
       case 'collecting_date':
-        data.date = message;
+        data.date = cleanMessage.substring(0, 50);
         return {
           reply: "At what time?",
           state: { stage: 'collecting_time', data: data }
         };
 
       case 'collecting_time':
-        data.time = message;
+        data.time = cleanMessage.substring(0, 50);
         return {
           reply: "Veg or Non-Veg?",
           options: ['Veg', 'Non-Veg'],
@@ -102,10 +129,11 @@ export const chatbotService = {
         };
 
       case 'collecting_food_details':
-        if (message.length > 2) {
-          data.basket = [...(data.basket || []), message];
+        if (cleanMessage.length > 2) {
+          const newItem = cleanMessage.substring(0, 100);
+          data.basket = [...(data.basket || []), newItem];
           return {
-            reply: `Added ${message}. Anything else?`,
+            reply: `Added ${newItem}. Anything else?`,
             options: ['Yes', 'No, Continue'],
             state: { stage: 'anything_else', data: data }
           };
@@ -166,6 +194,11 @@ export const chatbotService = {
       case 'done':
         if (lowerMessage.includes('done') || lowerMessage.includes('success') || lowerMessage.includes('payment')) {
           try {
+            // Server-side Step Guard: Verify phone and people exist before DB insertion
+            if (!data.phone || !data.num_people) {
+               throw new Error("Incomplete booking data. Please restart.");
+            }
+
             const { data: resv, error } = await supabase
               .from('table_reservations')
               .insert({

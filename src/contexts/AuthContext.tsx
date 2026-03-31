@@ -80,15 +80,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signInWithUsername = async (username: string, password: string) => {
-    // Dev Bypass: allow admin login if Supabase is not configured
-    if (!isConfigured) {
-      const isUserEmail = username === 'kirankumarchowdary637@gmail.com';
-      const isAdminLogin = username === 'admin' && password === 'admin';
+    // Dev Bypass: ONLY if explicitly enabled via ENV and Supabase is not yet configured
+    const isDevBypassEnabled = import.meta.env.VITE_ALLOW_ADMIN_BYPASS === 'true';
+    
+    if (!isConfigured && isDevBypassEnabled) {
+      const isAdminLogin = username === import.meta.env.VITE_DEV_ADMIN_USER && 
+                         password === import.meta.env.VITE_DEV_ADMIN_PASS;
       
-      if (isUserEmail || isAdminLogin) {
+      if (isAdminLogin) {
         const mockUser = {
-          id: 'mock-admin-id',
-          email: isUserEmail ? username : 'admin@vgrand.com',
+          id: 'dev-admin-id',
+          email: 'admin@vgrand-dev.local',
           app_metadata: {},
           user_metadata: {},
           aud: 'authenticated',
@@ -96,9 +98,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } as User;
         
         const mockProfile: Profile = {
-          id: 'mock-admin-id',
-          name: isUserEmail ? 'Kiran Kumar' : 'Royal Administrator',
-          email: isUserEmail ? username : 'admin@vgrand.com',
+          id: 'dev-admin-id',
+          name: 'Dev Administrator',
+          email: 'admin@vgrand-dev.local',
           role: 'admin',
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
