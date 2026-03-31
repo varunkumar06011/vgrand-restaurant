@@ -87,18 +87,32 @@ export const chatbotService = {
       case 'collecting_people':
         const numMatch = message.match(/(\d+)/);
         if (numMatch) {
-          data.num_people = parseInt(numMatch[1]);
+          const count = parseInt(numMatch[1]);
+          if (count < 1 || count > 20) {
+            return {
+              reply: "Our royal tables can accommodate groups between 1 and 20 guests. Please enter a valid number.",
+              state: { stage: 'collecting_people', data: data }
+            };
+          }
+          data.num_people = count;
           return {
             reply: `OK, ${data.num_people} people. Which date? (e.g. Tomorrow)`,
             state: { stage: 'collecting_date', data: data }
           };
         }
         return {
-          reply: "How many guests?",
+          reply: "How many guests will be joining? (1-20)",
           state: { stage: 'collecting_people', data: data }
         };
 
       case 'collecting_date':
+        const pastKeywords = ['yesterday', 'last', 'ago', 'previous', 'past'];
+        if (pastKeywords.some(word => lowerMessage.includes(word))) {
+          return {
+            reply: "The V Grand Scribes cannot book for the past! Please choose Today, Tomorrow, or a future date.",
+            state: { stage: 'collecting_date', data: data }
+          };
+        }
         data.date = cleanMessage.substring(0, 50);
         return {
           reply: "At what time?",
