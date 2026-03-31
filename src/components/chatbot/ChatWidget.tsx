@@ -87,14 +87,27 @@ const ChatWidget: React.FC = () => {
   const startApprovalSubscription = (reservationId: string) => {
     if (subscriptionRef.current) subscriptionRef.current.unsubscribe();
     subscriptionRef.current = chatbotService.subscribeToReservation(reservationId, (updatedRes: any) => {
-      if (updatedRes.status === 'confirmed') {
-        toast.success("SMS Notification Sent! 📱", { duration: 5000 });
+      const status = updatedRes.status?.toLowerCase() || '';
+      if (status.includes('confirm') || status.includes('reject')) {
+        const isApproved = status.includes('confirm');
+        if (isApproved) {
+          toast.success("SMS Notification Sent! 📱", { duration: 5000 });
+        } else {
+          toast.error("Reservation Update ❌");
+        }
+
         setMessages(prev => [...prev, {
           id: Date.now().toString(),
           role: 'assistant',
           type: 'notification',
-          content: updatedRes.notification_payload?.body || "Confirmed! ✅"
+          content: updatedRes.notification_payload?.body || (isApproved ? "Confirmed! ✅" : "Rejected ❌")
         }]);
+        
+        // Stop listening after a final status is received
+        if (subscriptionRef.current) {
+          subscriptionRef.current.unsubscribe();
+          subscriptionRef.current = null;
+        }
       }
     });
   };

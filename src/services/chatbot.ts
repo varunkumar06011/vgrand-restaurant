@@ -316,6 +316,16 @@ export const chatbotService = {
                   type: 'whatsapp'
                 }
               });
+            } else if (status.includes('reject')) {
+              console.log("[Chatbot] NOTICE: Rejection detected! Updating UI...");
+              onUpdate({
+                ...payload.new,
+                notification_payload: {
+                  title: "V GRAND UPDATE",
+                  body: `We apologize, but we are unable to fulfill your reservation request at this time. ❌ Please try another time or contact us directly.`,
+                  type: 'whatsapp'
+                }
+              });
             }
           }
         }
