@@ -61,6 +61,24 @@ const ChatWidget: React.FC = () => {
     }
   }, [messages, session]);
 
+  // FIX: Critical Scroll-Lock & UI Freeze Cleanup
+  // Radix UI Popovers/Dialogs can leave the body locked if their parent (ChatWidget) 
+  // is unmounted (via AnimatePresence) before they finish their close lifecycle.
+  useEffect(() => {
+    if (!isOpen) {
+      // Force release any locks when chatbot is closed
+      document.body.style.overflow = 'auto';
+      document.body.style.pointerEvents = 'auto';
+      setIsCalendarOpen(false);
+    }
+
+    return () => {
+      // Final fallback on component unmount
+      document.body.style.overflow = 'auto';
+      document.body.style.pointerEvents = 'auto';
+    };
+  }, [isOpen]);
+
   const saveToHistory = () => {
     if (messages.length < 2) return;
     const summary = session.data?.basket?.length > 0
@@ -384,7 +402,20 @@ const ChatWidget: React.FC = () => {
         )}
       </AnimatePresence>
 
-      <motion.button onClick={() => setIsOpen(!isOpen)} animate={{ y: [0, -10, 0], scale: [1, 1.05, 1], boxShadow: ["0 20px 40px -15px rgba(225, 29, 72, 0.4)", "0 30px 60px -15px rgba(225, 29, 72, 0.6)", "0 20px 40px -15px rgba(225, 29, 72, 0.4)"] }} transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} className="w-16 h-16 bg-white rounded-[22px] flex items-center justify-center shadow-2xl border-2 border-white/20 overflow-hidden">
+      <motion.button 
+        onClick={() => {
+          if (isOpen) {
+            // Force unlock body styles before animation starts
+            document.body.style.overflow = 'auto';
+            document.body.style.pointerEvents = 'auto';
+            setIsCalendarOpen(false);
+          }
+          setIsOpen(!isOpen);
+        }} 
+        animate={{ y: [0, -10, 0], scale: [1, 1.05, 1], boxShadow: ["0 20px 40px -15px rgba(225, 29, 72, 0.4)", "0 30px 60px -15px rgba(225, 29, 72, 0.6)", "0 20px 40px -15px rgba(225, 29, 72, 0.4)"] }} 
+        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} 
+        className="w-16 h-16 bg-white rounded-[22px] flex items-center justify-center shadow-2xl border-2 border-white/20 overflow-hidden"
+      >
         <img src="/chatbot-logo.png" alt="Chat" className="w-full h-full object-cover scale-110" />
       </motion.button>
     </div>
