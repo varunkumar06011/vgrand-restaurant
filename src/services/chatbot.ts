@@ -300,6 +300,7 @@ export const chatbotService = {
         },
         (payload) => {
           console.log("[Chatbot] GLOBAL UPDATE RECEIVED:", payload.new.id, "looking for:", reservationId);
+          console.log("[Chatbot] FULL PAYLOAD:", payload.new);
           
           // CRITICAL: Manual Match in JS
           if (payload.new.id === reservationId) {
@@ -327,6 +328,8 @@ export const chatbotService = {
                 }
               });
             }
+          } else {
+            console.warn("[Chatbot] UPDATE IGNORED: ID mismatch. New:", payload.new.id, "Expected:", reservationId);
           }
         }
       )
