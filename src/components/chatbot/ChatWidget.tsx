@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { MessageCircle, X, Send, Loader2, RotateCcw, Smartphone, Clock, ChevronLeft, Trash2, CreditCard } from 'lucide-react';
 import { chatbotService, ChatMessage, ChatSession } from '@/services/chatbot';
 import { toast } from 'sonner';
@@ -21,7 +21,7 @@ const ChatWidget: React.FC = () => {
   const [session, setSession] = useState<ChatSession>({ stage: 'idle', data: {} });
   const [showHistory, setShowHistory] = useState(false);
   const [history, setHistory] = useState<SavedChat[]>([]);
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const subscriptionRef = useRef<any>(null);
 
@@ -42,7 +42,7 @@ const ChatWidget: React.FC = () => {
       const parsed = JSON.parse(currentSession);
       setMessages(parsed.messages);
       setSession(parsed.session);
-      
+
       if (parsed.session.stage === 'awaiting_approval' && parsed.session.data?.reservation_id) {
         startApprovalSubscription(parsed.session.data.reservation_id);
       }
@@ -57,7 +57,7 @@ const ChatWidget: React.FC = () => {
 
   const saveToHistory = () => {
     if (messages.length < 2) return;
-    const summary = session.data?.basket?.length > 0 
+    const summary = session.data?.basket?.length > 0
       ? `Booking: ${session.data.basket.length} items for ${session.data.num_people || '?'}`
       : messages[0]?.content.substring(0, 30) + "...";
 
@@ -74,7 +74,7 @@ const ChatWidget: React.FC = () => {
     setShowHistory(false);
     toast.success("Conversation restored");
     if (chat.session.stage === 'awaiting_approval' && chat.session.data?.reservation_id) {
-        startApprovalSubscription(chat.session.data.reservation_id);
+      startApprovalSubscription(chat.session.data.reservation_id);
     }
   };
 
@@ -115,11 +115,11 @@ const ChatWidget: React.FC = () => {
 
       // Handle Automatic Payment Trigger
       if (response.state.stage === 'awaiting_payment') {
-          handlePayment(response.state.data);
+        handlePayment(response.state.data);
       }
 
       if (response.state.stage === 'awaiting_approval' && response.state.data?.reservation_id) {
-          startApprovalSubscription(response.state.data.reservation_id);
+        startApprovalSubscription(response.state.data.reservation_id);
       }
     } catch (error) {
       toast.error('Connection trouble. Please try again.');
@@ -185,13 +185,13 @@ const ChatWidget: React.FC = () => {
             <div className="p-6 bg-gradient-to-r from-rose-500/10 to-orange-500/10 border-b border-white/10 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {showHistory ? (
-                   <button onClick={() => setShowHistory(false)} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-all">
-                     <ChevronLeft size={18} />
-                   </button>
+                  <button onClick={() => setShowHistory(false)} className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white/40 hover:text-white transition-all">
+                    <ChevronLeft size={18} />
+                  </button>
                 ) : (
-                    <div className="w-10 h-10 bg-white/5 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden border border-white/10">
-                      <img src="/chatbot-logo.png" alt="Logo" className="w-full h-full object-cover scale-110" />
-                    </div>
+                  <div className="w-10 h-10 bg-white/5 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden border border-white/10">
+                    <img src="/chatbot-logo.png" alt="Logo" className="w-full h-full object-cover scale-110" />
+                  </div>
                 )}
                 <div>
                   <h3 className="text-white font-bold text-sm tracking-tight">
@@ -221,23 +221,23 @@ const ChatWidget: React.FC = () => {
 
             {/* History Overlay */}
             <AnimatePresence>
-                {showHistory && (
-                    <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} className="absolute inset-x-0 bottom-0 top-[89px] bg-[#1A1A1A] z-20 flex flex-col p-6 space-y-4 overflow-y-auto">
-                        {history.length === 0 ? (
-                            <div className="flex-1 flex flex-col items-center justify-center text-center text-white/20">
-                                <Clock size={40} className="mb-4 opacity-10" />
-                                <p className="text-sm">No past conversations yet.</p>
-                            </div>
-                        ) : (
-                            history.map((chat) => (
-                                <button key={chat.id} onClick={() => loadFromHistory(chat)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-left hover:bg-white/[0.08] transition-all group">
-                                    <p className="text-rose-500 text-[10px] font-black uppercase tracking-widest mb-1">{chat.timestamp}</p>
-                                    <p className="text-white/90 text-sm font-bold line-clamp-1">{chat.summary}</p>
-                                </button>
-                            ))
-                        )}
-                    </motion.div>
-                )}
+              {showHistory && (
+                <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} className="absolute inset-x-0 bottom-0 top-[89px] bg-[#1A1A1A] z-20 flex flex-col p-6 space-y-4 overflow-y-auto">
+                  {history.length === 0 ? (
+                    <div className="flex-1 flex flex-col items-center justify-center text-center text-white/20">
+                      <Clock size={40} className="mb-4 opacity-10" />
+                      <p className="text-sm">No past conversations yet.</p>
+                    </div>
+                  ) : (
+                    history.map((chat) => (
+                      <button key={chat.id} onClick={() => loadFromHistory(chat)} className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-left hover:bg-white/[0.08] transition-all group">
+                        <p className="text-rose-500 text-[10px] font-black uppercase tracking-widest mb-1">{chat.timestamp}</p>
+                        <p className="text-white/90 text-sm font-bold line-clamp-1">{chat.summary}</p>
+                      </button>
+                    ))
+                  )}
+                </motion.div>
+              )}
             </AnimatePresence>
 
             {/* Messages */}
@@ -245,10 +245,10 @@ const ChatWidget: React.FC = () => {
               {messages.map((msg) => (
                 <div key={msg.id} className={cn("flex flex-col gap-2", msg.role === 'user' ? 'items-end' : 'items-start')}>
                   {msg.type === 'notification' ? (
-                     <div className="w-full p-4 bg-green-500/10 border border-green-500/20 rounded-2xl flex flex-col gap-2">
-                        <div className="flex items-center gap-2 text-green-500 text-[10px] font-black uppercase tracking-widest"><Smartphone size={12} /> Official Confirmation</div>
-                        <p className="text-white/90 text-sm leading-relaxed">{msg.content}</p>
-                     </div>
+                    <div className="w-full p-4 bg-green-500/10 border border-green-500/20 rounded-2xl flex flex-col gap-2">
+                      <div className="flex items-center gap-2 text-green-500 text-[10px] font-black uppercase tracking-widest"><Smartphone size={12} /> Official Confirmation</div>
+                      <p className="text-white/90 text-sm leading-relaxed">{msg.content}</p>
+                    </div>
                   ) : (
                     <div className={cn("max-w-[80%] p-4 rounded-2xl text-sm", msg.role === 'user' ? 'bg-rose-500 text-white rounded-tr-none' : 'bg-white/5 text-white/90 border border-white/10 rounded-tl-none')}>
                       {msg.content}
@@ -264,10 +264,10 @@ const ChatWidget: React.FC = () => {
                             key={opt}
                             onClick={() => isPayment ? handlePayment(session.data) : handleSend(opt)}
                             className={cn(
-                                "px-3 py-1.5 rounded-lg text-xs transition-all font-bold flex items-center gap-2",
-                                isPayment 
-                                    ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20 hover:scale-105" 
-                                    : "bg-white/5 border border-white/10 text-rose-500 hover:bg-rose-500 hover:text-white"
+                              "px-3 py-1.5 rounded-lg text-xs transition-all font-bold flex items-center gap-2",
+                              isPayment
+                                ? "bg-rose-500 text-white shadow-lg shadow-rose-500/20 hover:scale-105"
+                                : "bg-white/5 border border-white/10 text-rose-500 hover:bg-rose-500 hover:text-white"
                             )}
                           >
                             {isPayment && <CreditCard size={12} />}
