@@ -264,8 +264,11 @@ export const chatbotService = {
       return { unsubscribe: () => {} };
     }
 
+    const safeChannel = `res_sh_${reservationId.substring(0, 8)}`;
+    console.log(`[Chatbot] Subscribing to: ${safeChannel} (ID: ${reservationId})`);
+    
     return supabase
-      .channel(`res_sync_unique_${reservationId}`)
+      .channel(safeChannel)
       .on(
         'postgres_changes',
         {
@@ -275,7 +278,11 @@ export const chatbotService = {
           filter: `id=eq.${reservationId}`
         },
         (payload) => {
-          if (payload.new.status === 'confirmed') {
+          console.log("[Chatbot] Realtime event received:", payload.new.status);
+          const status = (payload.new.status || '').toLowerCase();
+          
+          if (status.includes('confirm')) {
+            console.log("[Chatbot] SUCCESS: Match found, triggering UI update!");
             onUpdate({
               ...payload.new,
               notification_payload: {
@@ -287,6 +294,8 @@ export const chatbotService = {
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log(`[Chatbot] Subscription status for ${reservationId}:`, status);
+      });
   },
 };
