@@ -121,6 +121,12 @@ const ChatWidget: React.FC = () => {
       setMessages((prev) => [...prev, assistantMessage]);
       setSession(response.state);
 
+      // Halt if error
+      if (response.type === 'error') {
+        setIsLoading(false);
+        return;
+      }
+
       // Handle Automatic Payment Trigger
       if (response.state.stage === 'awaiting_payment') {
         handlePayment(response.state.data);

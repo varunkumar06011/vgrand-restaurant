@@ -220,8 +220,9 @@ export const chatbotService = {
           } catch (err) {
             console.error("DB Insert Error:", err);
             return {
-              reply: `Payment received ✅\nYour Order No is: **2800** (Local Mode).\nWe are waiting for admin approval...`,
-              state: { stage: 'awaiting_approval', data: { ...data, reservation_id: `mock_${Date.now()}`, token_number: 2800 } }
+              reply: `Booking system error ❌\nWe couldn't save your request. Please try again or call us!`,
+              type: 'error',
+              state: { stage: 'collecting_phone', data: data }
             };
           }
         }
@@ -239,7 +240,7 @@ export const chatbotService = {
     }
   },
 
-  async initiatePayment(bookingData: any) {
+  async initiatePayment(_bookingData: any) {
     try {
         return {
             key_id: 'rzp_test_mock',
@@ -258,21 +259,8 @@ export const chatbotService = {
   },
 
   subscribeToReservation(reservationId: string, onUpdate: (payload: any) => void) {
-    const startSim = () => {
-      setTimeout(() => {
-        onUpdate({ 
-          status: 'confirmed', 
-          notification_payload: {
-            title: "V GRAND OFFICIAL",
-            body: `Hi king/queen! Your payment is approved ✅ and your table (Order No: 2800) is officially confirmed! See you soon!`,
-            type: 'whatsapp'
-          }
-        });
-      }, 10000);
-    };
-
-    if (reservationId.includes('mock')) {
-      startSim();
+    if (!reservationId || reservationId.includes('mock')) {
+      console.warn("Invalid reservation ID for realtime subscription:", reservationId);
       return { unsubscribe: () => {} };
     }
 
