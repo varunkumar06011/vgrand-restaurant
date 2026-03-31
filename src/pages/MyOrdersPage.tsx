@@ -81,10 +81,10 @@ const MyOrdersPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background pb-32">
       {/* Cinematic Header */}
-      <div className="relative h-[45vh] flex items-center justify-center overflow-hidden border-b border-white/5">
+      <div className="relative h-[55vh] flex items-center justify-center overflow-hidden border-b border-white/5">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=1600&auto=format&fit=crop')] bg-cover bg-center grayscale opacity-10" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
-        <div className="relative z-10 text-center px-4 pt-12 sm:pt-0">
+        <div className="relative z-10 text-center px-4 pt-32 md:pt-40">
             <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -102,7 +102,7 @@ const MyOrdersPage: React.FC = () => {
         </div>
       </div>
 
-      <div className="container mx-auto max-w-5xl px-6 -mt-16 relative z-20">
+      <div className="container mx-auto max-w-5xl px-6 mt-12 relative z-20">
         {/* Search Section */}
             <div className="space-y-8">
             <div className="flex items-center gap-4 mb-2">
@@ -122,18 +122,18 @@ const MyOrdersPage: React.FC = () => {
                         value={phoneNumber}
                         onChange={e => setPhoneNumber(e.target.value)}
                         maxLength={10}
-                        className="bg-white/5 border-white/10 rounded-2xl h-16 pl-14 text-xl font-bold tracking-tight focus:border-primary transition-all text-white"
+                        className="bg-white/5 border-white/10 rounded-2xl h-[70px] pl-14 text-2xl font-bold tracking-tight focus:border-primary transition-all text-white"
                     />
                 </div>
               </div>
               <Button 
                 onClick={handleSearch} 
                 disabled={loading} 
-                className="w-full sm:h-16 h-14 px-8 md:px-12 shadow-xl shadow-primary/20 disabled:opacity-50 transition-all active:translate-y-1 active:shadow-none"
+                className="w-full lg:w-fit h-11 px-8 shadow-lg shadow-primary/10 disabled:opacity-50 transition-all active:translate-y-1 active:shadow-none"
               >
-                <span className="flex items-center gap-3">
-                    <Search className="h-5 w-5" />
-                    {loading ? 'Consulting Records...' : 'Search History'}
+                <span className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] italic">
+                    <Search className="h-4 w-4" />
+                    {loading ? 'Searching...' : 'Search History'}
                 </span>
               </Button>
             </div>
