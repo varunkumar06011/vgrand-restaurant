@@ -265,7 +265,7 @@ export const chatbotService = {
     }
 
     return supabase
-      .channel('res_sync')
+      .channel(`res_sync_unique_${reservationId}`)
       .on(
         'postgres_changes',
         {
@@ -280,7 +280,7 @@ export const chatbotService = {
               ...payload.new,
               notification_payload: {
                 title: "V GRAND OFFICIAL",
-                body: `Your booking is confirmed! See you soon! ✅`,
+                body: `Hey king/queen! your status is approved ✅ we will make things ready in mean while. See you soon!`,
                 type: 'whatsapp'
               }
             });
