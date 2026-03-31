@@ -205,12 +205,15 @@ const Reservations: React.FC = () => {
                    <div className="bg-black/40 rounded-2xl p-4 border border-white/5 min-h-[100px]">
                      {res.items && res.items.length > 0 ? (
                        <ul className="space-y-2">
-                         {res.items.map((item, i) => (
-                           <li key={i} className="text-sm text-white/70 flex items-center gap-2 capitalize">
-                             <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
-                             {item.quantity}x {item.name}
-                           </li>
-                         ))}
+                         {res.items.map((item, i) => {
+                           const isString = typeof item === 'string';
+                           return (
+                             <li key={i} className="text-sm text-white/70 flex items-center gap-2 capitalize">
+                               <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
+                               {isString ? item : `${item.quantity || 1}x ${item.name || 'Unknown Item'}`}
+                             </li>
+                           );
+                         })}
                        </ul>
                      ) : (
                        <p className="text-white/20 text-xs italic">No pre-orders with this booking</p>

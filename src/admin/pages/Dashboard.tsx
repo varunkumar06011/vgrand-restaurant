@@ -17,6 +17,7 @@ interface Stats {
   orderCount: number;
   totalRevenue: number;
   activeProducts: number;
+  visitorCount: number;
 }
 
 const Dashboard: React.FC = () => {
@@ -25,6 +26,7 @@ const Dashboard: React.FC = () => {
     orderCount: 0,
     totalRevenue: 0,
     activeProducts: 0,
+    visitorCount: 0,
   });
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -64,6 +66,12 @@ const Dashboard: React.FC = () => {
           .select('*', { count: 'exact', head: true })
           .eq('is_available', true);
 
+        // Site Visitors in Range
+        const { count: visitorCount } = await supabase
+          .from('site_visits')
+          .select('*', { count: 'exact', head: true })
+          .gte('created_at', startDate.toISOString());
+
         // Recent Orders
         const { data: recent } = await supabase
           .from('orders')
@@ -75,6 +83,7 @@ const Dashboard: React.FC = () => {
           orderCount: orderCount || 0,
           totalRevenue,
           activeProducts: activeProd || 0,
+          visitorCount: visitorCount || 0,
         });
         setRecentOrders(recent || []);
       } catch (error) {
@@ -98,6 +107,7 @@ const Dashboard: React.FC = () => {
   const statCards = [
     { label: `Orders ${activeRange}`, value: stats.orderCount, icon: ShoppingBag, color: 'text-blue-500' },
     { label: `Revenue ${activeRange}`, value: `₹${stats.totalRevenue.toLocaleString()}`, icon: TrendingUp, color: 'text-emerald-500' },
+    { label: 'Total Visitors', value: stats.visitorCount, icon: Users, color: 'text-rose-500' },
     { label: 'Active Products', value: stats.activeProducts, icon: Users, color: 'text-[#D4AF37]' },
   ];
 

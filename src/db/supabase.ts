@@ -24,3 +24,29 @@ const effectiveKey = (supabaseAnonKey && !supabaseAnonKey.includes('placeholder'
   : 'placeholder-key';
 
 export const supabase = createClient(effectiveUrl, effectiveKey);
+
+/**
+ * Log a site visit anonymously.
+ * Uses sessionStorage to prevent duplicate logs in the same session.
+ */
+export async function logVisit(path: string) {
+  if (!isConfigured) return;
+  
+  const hasLogged = sessionStorage.getItem(`vgrand_visit_${path}`);
+  if (hasLogged) return;
+
+  try {
+    const { error } = await supabase
+      .from('site_visits')
+      .insert({
+        path,
+        user_agent: navigator.userAgent
+      });
+
+    if (!error) {
+      sessionStorage.setItem(`vgrand_visit_${path}`, 'true');
+    }
+  } catch (e) {
+    console.warn('Silent visit log error:', e);
+  }
+}

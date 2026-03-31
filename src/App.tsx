@@ -7,10 +7,10 @@ import { CartProvider } from '@/contexts/CartContext';
 import { AuthProvider } from '@/contexts/AuthContext';
 import MainLayout from '@/components/layouts/MainLayout';
 import ScrollToTop from '@/components/common/ScrollToTop';
-import { isConfigured } from '@/db/supabase';
+import { isConfigured, logVisit } from '@/db/supabase';
 import { AlertCircle, Terminal, RefreshCcw } from 'lucide-react';
-import ChatWidget from '@/components/chatbot/ChatWidget';
 
+const ChatWidget = React.lazy(() => import('@/components/chatbot/ChatWidget'));
 import routes from './routes';
 
 const AdminApp = React.lazy(() => import('./admin/AdminApp'));
@@ -72,17 +72,28 @@ const ConfigError: React.FC = () => {
 const isDev = import.meta.env.DEV;
 
 const App: React.FC = () => {
+  const [showChat, setShowChat] = React.useState(false);
+
   if (!isConfigured && !isDev) {
     return <ConfigError />;
   }
 
   React.useEffect(() => {
+    if (isConfigured) {
+      logVisit(window.location.pathname);
+    }
+    
+    // Performance optimization: Delay chat loading slightly to prioritize core UI
+    const timer = setTimeout(() => setShowChat(true), 1500);
+
     if (!isConfigured && isDev) {
       toast.error("V Grand: Running in Mock Mode (Keys Missing)", {
         description: "The UI is active for testing, but data features require Supabase keys.",
         duration: 10000,
       });
     }
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -112,7 +123,11 @@ const App: React.FC = () => {
             } />
           </Routes>
           <Toaster />
-          <ChatWidget />
+          {showChat && (
+            <React.Suspense fallback={null}>
+              <ChatWidget />
+            </React.Suspense>
+          )}
         </CartProvider>
       </AuthProvider>
     </Router>

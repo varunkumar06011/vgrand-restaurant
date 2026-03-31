@@ -1,4 +1,18 @@
 import { supabase } from '@/db/supabase';
+import { z } from 'zod';
+import { sanitizeInput } from '@/lib/utils';
+
+// Strict Validation Schemas
+const ReservationDataSchema = z.object({
+  num_people: z.number().min(1).max(20).optional(),
+  date: z.string().min(1).max(50).optional(),
+  time: z.string().min(1).max(50).optional(),
+  phone: z.string().regex(/^\d{10}$/, "Must be 10 digits").optional(),
+  basket: z.array(z.string().min(1).max(100)).default([]),
+  current_dietary: z.enum(['veg', 'non-veg']).optional(),
+  reservation_id: z.string().optional(),
+  token_number: z.number().optional(),
+});
 
 export interface ChatMessage {
   id: string;
@@ -37,8 +51,21 @@ export const chatbotService = {
 
   // v4.6 Production-Ready Logic (Stuck-Fix Edition)
   async localSimulateResponse(message: string, _history: ChatMessage[], sessionState: ChatSession) {
-    const lowerMessage = message.toLowerCase();
-    const data = sessionState?.data ? { ...sessionState.data } : { basket: [] };
+    const rawMessage = message || "";
+    const lowerMessage = rawMessage.toLowerCase();
+    
+    // Sanitize input
+    const cleanMessage = sanitizeInput(rawMessage);
+    
+    // Validate session data or initialize
+    let data: any;
+    try {
+      data = ReservationDataSchema.parse(sessionState?.data || { basket: [] });
+    } catch (e) {
+      console.warn("Invalid session state detected, resetting safety defaults", e);
+      data = { basket: [] };
+    }
+
     const currentStage = sessionState?.stage || 'idle';
 
     // Global Reset
@@ -60,26 +87,42 @@ export const chatbotService = {
       case 'collecting_people':
         const numMatch = message.match(/(\d+)/);
         if (numMatch) {
-          data.num_people = parseInt(numMatch[1]);
+          const count = parseInt(numMatch[1]);
+          if (count < 1 || count > 20) {
+            return {
+              reply: "Our royal tables can accommodate groups between 1 and 20 guests. Please enter a valid number.",
+              state: { stage: 'collecting_people', data: data }
+            };
+          }
+          data.num_people = count;
           return {
             reply: `OK, ${data.num_people} people. Which date? (e.g. Tomorrow)`,
+            type: "date_picker",
             state: { stage: 'collecting_date', data: data }
           };
         }
         return {
-          reply: "How many guests?",
+          reply: "How many guests will be joining? (1-20)",
           state: { stage: 'collecting_people', data: data }
         };
 
       case 'collecting_date':
-        data.date = message;
+        const pastKeywords = ['yesterday', 'last', 'ago', 'previous', 'past'];
+        if (pastKeywords.some(word => lowerMessage.includes(word))) {
+          return {
+            reply: "The V Grand Scribes cannot book for the past! Please choose Today, Tomorrow, or a future date.",
+            type: "date_picker",
+            state: { stage: 'collecting_date', data: data }
+          };
+        }
+        data.date = cleanMessage.substring(0, 50);
         return {
           reply: "At what time?",
           state: { stage: 'collecting_time', data: data }
         };
 
       case 'collecting_time':
-        data.time = message;
+        data.time = cleanMessage.substring(0, 50);
         return {
           reply: "Veg or Non-Veg?",
           options: ['Veg', 'Non-Veg'],
@@ -102,10 +145,12 @@ export const chatbotService = {
         };
 
       case 'collecting_food_details':
-        if (message.length > 2) {
-          data.basket = [...(data.basket || []), message];
+        // Filter out short/junk inputs like 'X', '.', 'ok'
+        if (cleanMessage.length > 3 && !['done', 'yes', 'no'].includes(lowerMessage)) {
+          const newItem = cleanMessage.substring(0, 100);
+          data.basket = [...(data.basket || []), newItem];
           return {
-            reply: `Added ${message}. Anything else?`,
+            reply: `Added ${newItem}. Anything else?`,
             options: ['Yes', 'No, Continue'],
             state: { stage: 'anything_else', data: data }
           };
@@ -166,13 +211,22 @@ export const chatbotService = {
       case 'done':
         if (lowerMessage.includes('done') || lowerMessage.includes('success') || lowerMessage.includes('payment')) {
           try {
+            // Server-side Step Guard: Verify phone and people exist before DB insertion
+            if (!data.phone || !data.num_people) {
+               throw new Error("Incomplete booking data. Please restart.");
+            }
+
             const { data: resv, error } = await supabase
               .from('table_reservations')
               .insert({
                 customer_phone: data.phone,
                 num_people: data.num_people,
                 booking_time: new Date().toISOString(), 
-                items: data.basket,
+                // CRITICAL: Map strings to objects for Admin Dash compatibility
+                items: (data.basket || []).map((name: string) => ({ 
+                  name, 
+                  quantity: 1 
+                })),
                 status: 'pending_approval'
               })
               .select('*')
@@ -187,8 +241,9 @@ export const chatbotService = {
           } catch (err) {
             console.error("DB Insert Error:", err);
             return {
-              reply: `Payment received ✅\nYour Order No is: **2800** (Local Mode).\nWe are waiting for admin approval...`,
-              state: { stage: 'awaiting_approval', data: { ...data, reservation_id: `mock_${Date.now()}`, token_number: 2800 } }
+              reply: `Booking system error ❌\nWe couldn't save your request. Please try again or call us!`,
+              type: 'error',
+              state: { stage: 'collecting_phone', data: data }
             };
           }
         }
@@ -206,7 +261,7 @@ export const chatbotService = {
     }
   },
 
-  async initiatePayment(bookingData: any) {
+  async initiatePayment(_bookingData: any) {
     try {
         return {
             key_id: 'rzp_test_mock',
@@ -225,46 +280,48 @@ export const chatbotService = {
   },
 
   subscribeToReservation(reservationId: string, onUpdate: (payload: any) => void) {
-    const startSim = () => {
-      setTimeout(() => {
-        onUpdate({ 
-          status: 'confirmed', 
-          notification_payload: {
-            title: "V GRAND OFFICIAL",
-            body: `Hi king/queen! Your payment is approved ✅ and your table (Order No: 2800) is officially confirmed! See you soon!`,
-            type: 'whatsapp'
-          }
-        });
-      }, 10000);
-    };
-
-    if (reservationId.includes('mock')) {
-      startSim();
+    if (!reservationId || reservationId.includes('mock')) {
+      console.warn("Invalid reservation ID for realtime subscription:", reservationId);
       return { unsubscribe: () => {} };
     }
 
+    const safeChannel = `table_res_sync_${reservationId.substring(0, 8)}`;
+    console.log(`[Chatbot] GLOBAL Subscribing to: ${safeChannel} (ID: ${reservationId})`);
+    
     return supabase
-      .channel('res_sync')
+      .channel(safeChannel)
       .on(
         'postgres_changes',
         {
           event: 'UPDATE',
           schema: 'public',
-          table: 'table_reservations',
+          table: 'table_reservations'
+          // We remove the server side filter here to ensure the update reaches the client
         },
         (payload) => {
-          if (payload.new.id === reservationId && payload.new.status === 'confirmed') {
-            onUpdate({
-              ...payload.new,
-              notification_payload: {
-                title: "V GRAND OFFICIAL",
-                body: `Hi king/queen! Your payment is approved ✅ and your table (Order No: ${payload.new.token_number}) is officially confirmed! We have made things ready and your items are being prepared. See you soon!`,
-                type: 'whatsapp'
-              }
-            });
+          console.log("[Chatbot] GLOBAL UPDATE RECEIVED:", payload.new.id, "looking for:", reservationId);
+          
+          // CRITICAL: Manual Match in JS
+          if (payload.new.id === reservationId) {
+            console.log("[Chatbot] MATCH FOUND! Status:", payload.new.status);
+            const status = (payload.new.status || '').toLowerCase();
+            
+            if (status.includes('confirm')) {
+              console.log("[Chatbot] SUCCESS: Approval detected! Updating UI...");
+              onUpdate({
+                ...payload.new,
+                notification_payload: {
+                  title: "V GRAND OFFICIAL",
+                  body: `Hey king/queen! your status is approved ✅ we will make things ready in mean while. See you soon!`,
+                  type: 'whatsapp'
+                }
+              });
+            }
           }
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log(`[Chatbot] Subscription status:`, status);
+      });
   },
 };

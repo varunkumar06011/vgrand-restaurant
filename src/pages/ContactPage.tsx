@@ -18,10 +18,10 @@ const ContactPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background pb-32 overflow-hidden">
       {/* Cinematic Header */}
-      <div className="relative h-[50vh] flex items-center justify-center overflow-hidden border-b border-white/5">
+      <div className="relative h-[60vh] flex items-center justify-center overflow-hidden border-b border-white/5">
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=1600&auto=format&fit=crop')] bg-cover bg-fixed bg-center grayscale opacity-10" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-        <div className="relative z-10 text-center px-4 pt-16 sm:pt-0">
+        <div className="relative z-10 text-center px-4 pt-32 md:pt-40">
             <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
@@ -32,14 +32,14 @@ const ContactPage: React.FC = () => {
             <motion.h1 
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="text-4xl sm:text-5xl md:text-8xl lg:text-9xl font-bold text-white uppercase tracking-tight leading-tight"
+                className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white uppercase tracking-tight leading-tight"
             >
                 The <span className="text-gold underline decoration-primary/20">Palace</span>
             </motion.h1>
         </div>
       </div>
 
-      <div className="container mx-auto max-w-7xl px-6 -mt-24 relative z-20">
+      <div className="container mx-auto max-w-7xl px-6 -mt-12 relative z-20">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
           {/* Contact Information */}
           <motion.div 
@@ -54,7 +54,7 @@ const ContactPage: React.FC = () => {
               <div className="relative z-10 space-y-12">
                 <div className="space-y-4">
                     <h2 className="text-[10px] uppercase font-bold tracking-[0.4em] text-primary">Establishment Details</h2>
-                    <h3 className="text-3xl md:text-5xl font-bold text-white uppercase tracking-tight leading-tight">Connect with <span className="text-gold">Grandeur</span></h3>
+                    <h3 className="text-2xl md:text-4xl font-bold text-white uppercase tracking-tight leading-tight">Connect with <span className="text-gold">Grandeur</span></h3>
                 </div>
 
                 <div className="space-y-8">
