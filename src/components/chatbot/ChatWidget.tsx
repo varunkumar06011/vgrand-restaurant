@@ -85,16 +85,12 @@ const ChatWidget: React.FC = () => {
   };
 
   const startApprovalSubscription = (reservationId: string) => {
-    console.log("[ChatWidget] Starting approval subscription for ID:", reservationId);
     if (subscriptionRef.current) {
-      console.log("[ChatWidget] Removing existing subscription before restart");
       subscriptionRef.current.unsubscribe();
     }
 
     subscriptionRef.current = chatbotService.subscribeToReservation(reservationId, (updatedRes: any) => {
-      console.log("[ChatWidget] REALTIME UPDATE RECEIVED:", updatedRes);
       const status = (updatedRes.status || '').toLowerCase();
-      console.log("[ChatWidget] DETECTED STATUS:", status);
 
       if (status.includes('confirm') || status.includes('reject')) {
         const isApproved = status.includes('confirm');
@@ -113,7 +109,6 @@ const ChatWidget: React.FC = () => {
         
         // Stop listening after a final status is received
         if (subscriptionRef.current) {
-          console.log("[ChatWidget] Final status received, unsubscribing...");
           subscriptionRef.current.unsubscribe();
           subscriptionRef.current = null;
         }

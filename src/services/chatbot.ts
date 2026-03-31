@@ -299,16 +299,11 @@ export const chatbotService = {
           // We remove the server side filter here to ensure the update reaches the client
         },
         (payload) => {
-          console.log("[Chatbot] GLOBAL UPDATE RECEIVED:", payload.new.id, "looking for:", reservationId);
-          console.log("[Chatbot] FULL PAYLOAD:", payload.new);
-          
           // CRITICAL: Manual Match in JS
           if (payload.new.id === reservationId) {
-            console.log("[Chatbot] MATCH FOUND! Status:", payload.new.status);
             const status = (payload.new.status || '').toLowerCase();
             
             if (status.includes('confirm')) {
-              console.log("[Chatbot] SUCCESS: Approval detected! Updating UI...");
               onUpdate({
                 ...payload.new,
                 notification_payload: {
@@ -318,7 +313,6 @@ export const chatbotService = {
                 }
               });
             } else if (status.includes('reject')) {
-              console.log("[Chatbot] NOTICE: Rejection detected! Updating UI...");
               onUpdate({
                 ...payload.new,
                 notification_payload: {
@@ -328,8 +322,6 @@ export const chatbotService = {
                 }
               });
             }
-          } else {
-            console.warn("[Chatbot] UPDATE IGNORED: ID mismatch. New:", payload.new.id, "Expected:", reservationId);
           }
         }
       )
