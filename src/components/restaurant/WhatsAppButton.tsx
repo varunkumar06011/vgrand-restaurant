@@ -10,7 +10,7 @@ const WhatsAppButton: React.FC = () => {
   return (
     <button
       onClick={handleWhatsApp}
-      className="fixed bottom-24 right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-transform hover:scale-110 md:top-28 md:right-6"
+      className="hidden md:flex fixed bottom-24 right-4 z-40 h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-transform hover:scale-110 md:top-28 md:right-6"
       aria-label="Order on WhatsApp"
     >
       <svg className="h-7 w-7" viewBox="0 0 24 24" fill="currentColor">

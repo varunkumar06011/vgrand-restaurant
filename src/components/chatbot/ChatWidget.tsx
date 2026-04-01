@@ -259,14 +259,23 @@ const ChatWidget: React.FC = () => {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-[9999] font-sans flex flex-col items-end">
+    <div className={cn(
+      "fixed z-[10000] font-sans flex items-end transition-all duration-500",
+      // Desktop: bottom-right, window opens UP
+      "md:bottom-6 md:right-6 md:flex-col-reverse md:top-auto",
+      // Mobile: bottom-right (Red Box area highlighted by user)
+      "bottom-24 right-4 flex-col-reverse top-auto"
+    )}>
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            initial={{ opacity: 0, y: isOpen ? (window.innerWidth < 768 ? -20 : 20) : 0, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="chatbot-container mb-4 w-[calc(100vw-3rem)] sm:w-[380px] h-[min(85vh,580px)] bg-[#1A1A1A] border border-white/10 rounded-[32px] shadow-2xl flex flex-col overflow-hidden backdrop-blur-xl relative"
+            exit={{ opacity: 0, y: window.innerWidth < 768 ? -20 : 20, scale: 0.95 }}
+            className={cn(
+                "chatbot-container w-[calc(100vw-3rem)] sm:w-[380px] h-[min(85vh,580px)] bg-[#1A1A1A] border border-white/10 rounded-[32px] shadow-2xl flex flex-col overflow-hidden backdrop-blur-xl relative",
+                "md:mb-4 md:mt-0 mt-4 mb-0"
+            )}
           >
             {/* Header */}
             <div className="p-6 bg-gradient-to-r from-rose-500/10 to-orange-500/10 border-b border-white/10 flex items-center justify-between">
@@ -429,9 +438,13 @@ const ChatWidget: React.FC = () => {
 
       <motion.button 
         onClick={() => setIsOpen(!isOpen)} 
-        animate={{ y: [0, -10, 0], scale: [1, 1.05, 1], boxShadow: ["0 20px 40px -15px rgba(225, 29, 72, 0.4)", "0 30px 60px -15px rgba(225, 29, 72, 0.6)", "0 20px 40px -15px rgba(225, 29, 72, 0.4)"] }} 
-        transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} 
-        className="w-16 h-16 bg-white rounded-[22px] flex items-center justify-center shadow-2xl border-2 border-white/20 overflow-hidden"
+        animate={{ y: [0, -5, 0], scale: [1, 1.02, 1], boxShadow: ["0 10px 30px -10px rgba(225, 29, 72, 0.4)", "0 20px 40px -10px rgba(225, 29, 72, 0.6)", "0 10px 30px -10px rgba(225, 29, 72, 0.4)"] }} 
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} 
+        className={cn(
+          "bg-white flex items-center justify-center shadow-2xl border-2 border-white/20 overflow-hidden transition-all duration-500",
+          "md:w-16 md:h-16 md:rounded-[22px]",
+          "w-12 h-12 rounded-full"
+        )}
       >
         <img src="/chatbot-logo.png" alt="Chat" className="w-full h-full object-cover scale-110" />
       </motion.button>
