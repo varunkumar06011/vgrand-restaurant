@@ -27,22 +27,36 @@ const FeaturedBiryanis: React.FC = () => {
         return;
       }
 
-      // Home page Signature Biryanis section should only show biryani category
+      // Home page Signature Dishes section should only show specific signature items
       const { data, error } = await supabase
         .from('menu_items')
         .select('*')
-        .eq('category', 'biryani')
+        .in('name', [
+          'Mutton Keema Biryani',
+          'Special Chicken Biryani',
+          'Chicken 65',
+          'Apollo Fish'
+        ])
         .eq('is_available', true)
-        .eq('is_bestseller', true)
-        .limit(6);
+        .limit(4);
 
       if (error || !data) {
         setItems([]);
       } else {
-        setItems(data);
+        // Ensure accurate ordering as requested
+        const orderedNames = [
+          'Mutton Keema Biryani',
+          'Special Chicken Biryani',
+          'Chicken 65',
+          'Apollo Fish'
+        ];
+        const sortedData = data.sort((a, b) => 
+          orderedNames.indexOf(a.name) - orderedNames.indexOf(b.name)
+        );
+        setItems(sortedData);
       }
     } catch (error) {
-      console.error('Failed to load bestseller items:', error);
+      console.error('Failed to load signature items:', error);
       setItems([]);
     } finally {
       setLoading(false);
@@ -87,7 +101,7 @@ const FeaturedBiryanis: React.FC = () => {
     <section className="bg-background py-12 md:py-16">
       <div className="container mx-auto px-4">
         <h2 className="mb-16 text-center text-4xl md:text-7xl font-bold uppercase tracking-tight text-white">
-          Signature <span className="text-primary underline decoration-white/10">Biryanis</span>
+          Signature <span className="text-primary underline decoration-white/10">Dishes</span>
         </h2>
 
         <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 lg:grid-cols-3">
