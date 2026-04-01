@@ -61,22 +61,47 @@ const ChatWidget: React.FC = () => {
     }
   }, [messages, session]);
 
-  // FIX: Critical Scroll-Lock & UI Freeze Cleanup
-  // Radix UI Popovers/Dialogs can leave the body locked if their parent (ChatWidget) 
-  // is unmounted (via AnimatePresence) before they finish their close lifecycle.
+  // Robust scroll locking and listener management
+  useEffect(() => {
+    if (isOpen) {
+      // 1. Properly manage scroll locking: Restore when it closes
+      const originalStyle = window.getComputedStyle(document.body).overflow;
+      document.body.style.overflow = 'hidden';
+
+      // 2. Prevent scroll blocking on mobile: Do not globally block touchmove unless properly restored
+      // Using a capture listener to ensure we can stop scroll events from propagating to the body
+      const preventDefault = (e: TouchEvent | WheelEvent) => {
+        const target = e.target as HTMLElement;
+        const isInsideChat = target.closest('.chatbot-container');
+        
+        // If the interaction is outside the chatbot, prevent it
+        if (!isInsideChat) {
+          if (e.cancelable) e.preventDefault();
+        }
+      };
+
+      // Add listeners with non-passive to allow preventDefault
+      // Use capture phase to catch events early
+      document.addEventListener('touchmove', preventDefault as EventListener, { passive: false, capture: true });
+      document.addEventListener('wheel', preventDefault as EventListener, { passive: false, capture: true });
+
+      return () => {
+        // 3. Ensure complete component unmount cleanup:
+        // Reset global styles and remove ALL event listeners
+        document.body.style.overflow = originalStyle;
+        document.removeEventListener('touchmove', preventDefault as EventListener, { capture: true });
+        document.removeEventListener('wheel', preventDefault as EventListener, { capture: true });
+      };
+    }
+  }, [isOpen]);
+
+  // Ensure all overlays are closed and state resets correctly when the main widget closes
   useEffect(() => {
     if (!isOpen) {
-      // Force release any locks when chatbot is closed
-      document.body.style.overflow = 'auto';
-      document.body.style.pointerEvents = 'auto';
       setIsCalendarOpen(false);
+      setShowHistory(false);
+      // No lingering state blocking UI updates
     }
-
-    return () => {
-      // Final fallback on component unmount
-      document.body.style.overflow = 'auto';
-      document.body.style.pointerEvents = 'auto';
-    };
   }, [isOpen]);
 
   const saveToHistory = () => {
@@ -241,7 +266,7 @@ const ChatWidget: React.FC = () => {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="mb-4 w-[calc(100vw-3rem)] sm:w-[380px] h-[min(85vh,580px)] bg-[#1A1A1A] border border-white/10 rounded-[32px] shadow-2xl flex flex-col overflow-hidden backdrop-blur-xl relative"
+            className="chatbot-container mb-4 w-[calc(100vw-3rem)] sm:w-[380px] h-[min(85vh,580px)] bg-[#1A1A1A] border border-white/10 rounded-[32px] shadow-2xl flex flex-col overflow-hidden backdrop-blur-xl relative"
           >
             {/* Header */}
             <div className="p-6 bg-gradient-to-r from-rose-500/10 to-orange-500/10 border-b border-white/10 flex items-center justify-between">
@@ -357,7 +382,7 @@ const ChatWidget: React.FC = () => {
               />
               <div className="relative flex items-center gap-2">
                 {session?.stage === 'collecting_date' && (
-                  <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                  <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen} modal={false}>
                     <PopoverTrigger asChild>
                       <button 
                         onClick={() => setIsCalendarOpen(true)}
@@ -403,15 +428,7 @@ const ChatWidget: React.FC = () => {
       </AnimatePresence>
 
       <motion.button 
-        onClick={() => {
-          if (isOpen) {
-            // Force unlock body styles before animation starts
-            document.body.style.overflow = 'auto';
-            document.body.style.pointerEvents = 'auto';
-            setIsCalendarOpen(false);
-          }
-          setIsOpen(!isOpen);
-        }} 
+        onClick={() => setIsOpen(!isOpen)} 
         animate={{ y: [0, -10, 0], scale: [1, 1.05, 1], boxShadow: ["0 20px 40px -15px rgba(225, 29, 72, 0.4)", "0 30px 60px -15px rgba(225, 29, 72, 0.6)", "0 20px 40px -15px rgba(225, 29, 72, 0.4)"] }} 
         transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }} 
         className="w-16 h-16 bg-white rounded-[22px] flex items-center justify-center shadow-2xl border-2 border-white/20 overflow-hidden"
