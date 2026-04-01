@@ -336,7 +336,7 @@ const ChatWidget: React.FC = () => {
                   </button>
                 ) : (
                   <div className="w-10 h-10 bg-white/5 rounded-2xl flex items-center justify-center shadow-lg overflow-hidden border border-white/10">
-                    <img src="/chatbot-logo.png" alt="Logo" className="w-full h-full object-cover scale-110" />
+                    <img src="/chatbot-logo.png" alt="Logo" className="w-full h-full object-cover" />
                   </div>
                 )}
                 <div>
@@ -496,7 +496,7 @@ const ChatWidget: React.FC = () => {
           "w-12 h-12 rounded-full"
         )}
       >
-        <img src="/chatbot-logo.png" alt="Chat" className="w-full h-full object-cover scale-110" />
+        <img src="/chatbot-logo.png" alt="Chat" className="w-full h-full object-cover" />
       </motion.button>
     </div>
   );
