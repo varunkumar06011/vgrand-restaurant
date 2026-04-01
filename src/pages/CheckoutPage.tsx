@@ -141,7 +141,7 @@ const CheckoutPage: React.FC = () => {
         <div className="relative h-[40vh] flex items-center justify-center overflow-hidden border-b border-white/5">
             <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=1600&auto=format&fit=crop')] bg-cover bg-center grayscale opacity-10" />
             <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-            <div className="relative z-10 text-center px-4 pt-12 sm:pt-0">
+            <div className="relative z-10 text-center px-4 pt-12 lg:pt-24">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -152,7 +152,7 @@ const CheckoutPage: React.FC = () => {
                 <motion.h1 
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-3xl sm:text-4xl md:text-7xl lg:text-8xl font-bold text-white uppercase tracking-tight leading-tight"
+                    className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white uppercase tracking-tight leading-tight"
                 >
                     Checkout <span className="text-primary underline decoration-gold/30">Secure</span>
                 </motion.h1>

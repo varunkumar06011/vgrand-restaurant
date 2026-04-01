@@ -8,11 +8,11 @@ const OrderSuccessPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6 overflow-hidden relative">
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 pt-32 overflow-hidden relative">
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=1600&auto=format&fit=crop')] bg-cover bg-center grayscale opacity-5" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[120px] opacity-20" />
-
+ 
       <div className="relative z-10 w-full max-w-2xl">
         <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 30 }}
@@ -26,8 +26,8 @@ const OrderSuccessPage: React.FC = () => {
                 transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
                 className="absolute inset-0 border-2 border-dashed border-primary/20 rounded-full scale-125"
              />
-             <div className="h-32 w-32 bg-primary flex items-center justify-center rounded-full shadow-2xl shadow-primary/20">
-                <Sparkles className="h-16 w-16 text-background" />
+             <div className="h-16 w-16 bg-primary flex items-center justify-center rounded-full shadow-2xl shadow-primary/20">
+                <Sparkles className="h-8 w-8 text-background" />
              </div>
           </div>
 
@@ -36,10 +36,10 @@ const OrderSuccessPage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
           >
-            <h2 className="text-6xl md:text-8xl font-bold text-white uppercase tracking-tight mb-4 leading-tight">
+            <h2 className="text-4xl md:text-6xl font-bold text-white uppercase tracking-tight mb-4 leading-[1.1]">
                 Order <span className="text-primary underline decoration-gold/30">Confirmed</span>
             </h2>
-            <p className="text-gold/60 uppercase tracking-[0.4em] text-xs font-bold mb-12">
+            <p className="text-gold/60 uppercase tracking-[0.4em] text-[10px] font-bold mb-12">
                 Your order has been recorded
             </p>
           </motion.div>
