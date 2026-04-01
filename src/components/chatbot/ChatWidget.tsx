@@ -48,10 +48,6 @@ const ChatWidget: React.FC = () => {
       const parsed = JSON.parse(currentSession);
       setMessages(parsed.messages);
       setSession(parsed.session);
-
-      if (parsed.session.stage === 'awaiting_approval' && parsed.session.data?.reservation_id) {
-        startApprovalSubscription(parsed.session.data.reservation_id);
-      }
     }
   }, []);
 
@@ -73,7 +69,7 @@ const ChatWidget: React.FC = () => {
       const preventDefault = (e: TouchEvent | WheelEvent) => {
         const target = e.target as HTMLElement;
         const isInsideChat = target.closest('.chatbot-container');
-        
+
         // If the interaction is outside the chatbot, prevent it
         if (!isInsideChat) {
           if (e.cancelable) e.preventDefault();
@@ -122,42 +118,101 @@ const ChatWidget: React.FC = () => {
     setSession(chat.session);
     setShowHistory(false);
     toast.success("Conversation restored");
-    if (chat.session.stage === 'awaiting_approval' && chat.session.data?.reservation_id) {
-      startApprovalSubscription(chat.session.data.reservation_id);
-    }
   };
 
-  const startApprovalSubscription = (reservationId: string) => {
-    if (subscriptionRef.current) {
-      subscriptionRef.current.unsubscribe();
+  // Robus Reservation Status Tracking
+  useEffect(() => {
+    if (session.stage !== 'awaiting_approval' || !session.data?.reservation_id) {
+      // Cleanup previous subscription if stage changed
+      if (subscriptionRef.current?.unsubscribe) {
+        subscriptionRef.current.unsubscribe();
+        subscriptionRef.current = null;
+      }
+      return;
     }
 
-    subscriptionRef.current = chatbotService.subscribeToReservation(reservationId, (updatedRes: any) => {
+    const reservationId = session.data.reservation_id;
+    let pollInterval: any = null;
+
+    // 1. Define common handler
+    const handleUpdate = (updatedRes: any) => {
+      if (!updatedRes) return;
       const status = (updatedRes.status || '').toLowerCase();
 
       if (status.includes('confirm') || status.includes('reject')) {
         const isApproved = status.includes('confirm');
-        if (isApproved) {
-          toast.success("SMS Notification Sent! 📱", { duration: 5000 });
-        } else {
-          toast.error("Reservation Update ❌");
-        }
-
-        setMessages(prev => [...prev, {
-          id: Date.now().toString(),
-          role: 'assistant',
-          type: 'notification',
-          content: updatedRes.notification_payload?.body || (isApproved ? "Confirmed! ✅" : "Rejected ❌")
-        }]);
         
-        // Stop listening after a final status is received
-        if (subscriptionRef.current) {
+        setMessages(prev => {
+          // Guard: Prevent duplicate notifications (from Realtime + Polling)
+          const hasNotif = prev.some(m => 
+            m.type === 'notification' && 
+            m.content.includes(isApproved ? 'APPROVED' : 'unable')
+          );
+          if (hasNotif) return prev;
+
+          if (isApproved) {
+            toast.success("SMS Notification Sent! 📱", { duration: 5000 });
+          } else {
+            toast.error("Reservation Update ❌");
+          }
+
+          return [...prev, {
+            id: Date.now().toString(),
+            role: 'assistant',
+            type: 'notification',
+            content: updatedRes.notification_payload?.body || (isApproved ? "Confirmed! ✅" : "Rejected ❌")
+          }];
+        });
+
+        // CRITICAL: Update stage so polling/effect stops
+        setSession(prev => ({ ...prev, stage: 'done' }));
+        
+        // Cleanup
+        if (pollInterval) clearInterval(pollInterval);
+        if (subscriptionRef.current?.unsubscribe) {
           subscriptionRef.current.unsubscribe();
           subscriptionRef.current = null;
         }
       }
-    });
-  };
+    };
+
+    // 2. Primary: Realtime Subscription
+    console.log(`[Chatbot] Starting realtime sync for ${reservationId}`);
+    subscriptionRef.current = chatbotService.subscribeToReservation(reservationId, handleUpdate);
+
+    // 3. Secondary (Bulletproof): 5-second Polling Fallback
+    pollInterval = setInterval(async () => {
+      // In effect-based polling, we don't worry as much about stale closures 
+      // because the entire effect re-runs if session.stage changes.
+      // But we still poll for safety.
+      console.log(`[Chatbot] Polling check for ${reservationId}...`);
+      const data = await chatbotService.getReservationStatus(reservationId);
+      if (data) {
+        const currentStatus = (data.status || '').toLowerCase();
+        if (currentStatus.includes('confirm') || currentStatus.includes('reject')) {
+          console.log(`[Chatbot] Polling found final status: ${currentStatus}`);
+          const isApproved = currentStatus.includes('confirm');
+          handleUpdate({
+            ...data,
+            notification_payload: {
+              body: isApproved 
+                ? "Hey king/queen! Your reservation is APPROVED! ✅ We'll have everything ready for you. See you soon!" 
+                : "We apologize, but we are unable to fulfill your reservation request at this time. ❌ Please try another time."
+            }
+          });
+        }
+      }
+    }, 5000);
+
+    return () => {
+      console.log(`[Chatbot] Cleaning up tracking for ${reservationId}`);
+      if (pollInterval) clearInterval(pollInterval);
+      if (subscriptionRef.current?.unsubscribe) {
+        subscriptionRef.current.unsubscribe();
+        subscriptionRef.current = null;
+      }
+    };
+  }, [session.stage, session.data?.reservation_id]);
 
   const handleSend = async (overrideInput?: string) => {
     const textToSend = overrideInput || input;
@@ -187,7 +242,7 @@ const ChatWidget: React.FC = () => {
       setMessages((prev) => [...prev, assistantMessage]);
       setSession(response.state);
 
-      // Halt if error
+      // HALT if error
       if (response.type === 'error') {
         setIsLoading(false);
         return;
@@ -196,10 +251,6 @@ const ChatWidget: React.FC = () => {
       // Handle Automatic Payment Trigger
       if (response.state.stage === 'awaiting_payment') {
         handlePayment(response.state.data);
-      }
-
-      if (response.state.stage === 'awaiting_approval' && response.state.data?.reservation_id) {
-        startApprovalSubscription(response.state.data.reservation_id);
       }
     } catch (error) {
       toast.error('Connection trouble. Please try again.');
@@ -243,7 +294,6 @@ const ChatWidget: React.FC = () => {
           const response = await chatbotService.sendMessage("done", messages, session);
           setMessages((prev) => [...prev, { id: Date.now().toString(), role: 'assistant', content: response.reply, options: response.options }]);
           setSession(response.state);
-          if (response.state.data?.reservation_id) startApprovalSubscription(response.state.data.reservation_id);
         },
         prefill: { contact: data.phone },
         theme: { color: '#E11D48' },
@@ -273,8 +323,8 @@ const ChatWidget: React.FC = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: window.innerWidth < 768 ? -20 : 20, scale: 0.95 }}
             className={cn(
-                "chatbot-container w-[calc(100vw-3rem)] sm:w-[380px] h-[min(85vh,580px)] bg-[#1A1A1A] border border-white/10 rounded-[32px] shadow-2xl flex flex-col overflow-hidden backdrop-blur-xl relative",
-                "md:mb-4 md:mt-0 mt-4 mb-0"
+              "chatbot-container w-[calc(100vw-3rem)] sm:w-[380px] h-[min(85vh,580px)] bg-[#1A1A1A] border border-white/10 rounded-[32px] shadow-2xl flex flex-col overflow-hidden backdrop-blur-xl relative",
+              "md:mb-4 md:mt-0 mt-4 mb-0"
             )}
           >
             {/* Header */}
@@ -381,11 +431,11 @@ const ChatWidget: React.FC = () => {
             {/* Input */}
             <div className="p-4 sm:p-6 bg-black/40 border-t border-white/10 shrink-0">
               {/* Bot Honeypot - Hidden from humans */}
-              <input 
-                type="text" 
-                value={honeypot} 
-                onChange={(e) => setHoneypot(e.target.value)} 
-                className="hidden" 
+              <input
+                type="text"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                className="hidden"
                 autoComplete="off"
                 tabIndex={-1}
               />
@@ -393,7 +443,7 @@ const ChatWidget: React.FC = () => {
                 {session?.stage === 'collecting_date' && (
                   <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen} modal={false}>
                     <PopoverTrigger asChild>
-                      <button 
+                      <button
                         onClick={() => setIsCalendarOpen(true)}
                         className="w-12 h-12 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-lg shrink-0 group"
                       >
@@ -405,7 +455,7 @@ const ChatWidget: React.FC = () => {
                         mode="single"
                         selected={date}
                         onSelect={handleDateSelect}
-                        disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}
+                        disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
                         initialFocus
                         className="bg-transparent text-white"
                         classNames={{
@@ -420,13 +470,13 @@ const ChatWidget: React.FC = () => {
                   </Popover>
                 )}
                 <div className="relative flex-1">
-                  <input 
-                    type="text" 
-                    value={input} 
-                    onChange={(e) => setInput(e.target.value)} 
-                    onKeyPress={(e) => e.key === 'Enter' && handleSend()} 
-                    placeholder={isLoading ? "Processing..." : "Ask..."} 
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 sm:py-4 pl-4 sm:pl-6 pr-14 text-sm text-white focus:border-rose-500/50 transition-all font-sans" 
+                  <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+                    placeholder={isLoading ? "Processing..." : "Ask..."}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-3 sm:py-4 pl-4 sm:pl-6 pr-14 text-sm text-white focus:border-rose-500/50 transition-all font-sans"
                   />
                   <button onClick={() => handleSend()} disabled={isLoading || !input.trim()} className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-rose-500 rounded-xl flex items-center justify-center text-white"><Send size={18} /></button>
                 </div>
@@ -436,10 +486,10 @@ const ChatWidget: React.FC = () => {
         )}
       </AnimatePresence>
 
-      <motion.button 
-        onClick={() => setIsOpen(!isOpen)} 
-        animate={{ y: [0, -5, 0], scale: [1, 1.02, 1], boxShadow: ["0 10px 30px -10px rgba(225, 29, 72, 0.4)", "0 20px 40px -10px rgba(225, 29, 72, 0.6)", "0 10px 30px -10px rgba(225, 29, 72, 0.4)"] }} 
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }} 
+      <motion.button
+        onClick={() => setIsOpen(!isOpen)}
+        animate={{ y: [0, -5, 0], scale: [1, 1.02, 1], boxShadow: ["0 10px 30px -10px rgba(225, 29, 72, 0.4)", "0 20px 40px -10px rgba(225, 29, 72, 0.6)", "0 10px 30px -10px rgba(225, 29, 72, 0.4)"] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         className={cn(
           "bg-white flex items-center justify-center shadow-2xl border-2 border-white/20 overflow-hidden transition-all duration-500",
           "md:w-16 md:h-16 md:rounded-[22px]",

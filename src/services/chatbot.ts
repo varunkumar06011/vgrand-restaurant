@@ -53,10 +53,10 @@ export const chatbotService = {
   async localSimulateResponse(message: string, _history: ChatMessage[], sessionState: ChatSession) {
     const rawMessage = message || "";
     const lowerMessage = rawMessage.toLowerCase();
-    
+
     // Sanitize input
     const cleanMessage = sanitizeInput(rawMessage);
-    
+
     // Validate session data or initialize
     let data: any;
     try {
@@ -213,7 +213,7 @@ export const chatbotService = {
           try {
             // Server-side Step Guard: Verify phone and people exist before DB insertion
             if (!data.phone || !data.num_people) {
-               throw new Error("Incomplete booking data. Please restart.");
+              throw new Error("Incomplete booking data. Please restart.");
             }
 
             const { data: resv, error } = await supabase
@@ -221,11 +221,11 @@ export const chatbotService = {
               .insert({
                 customer_phone: data.phone,
                 num_people: data.num_people,
-                booking_time: new Date().toISOString(), 
+                booking_time: new Date().toISOString(),
                 // CRITICAL: Map strings to objects for Admin Dash compatibility
-                items: (data.basket || []).map((name: string) => ({ 
-                  name, 
-                  quantity: 1 
+                items: (data.basket || []).map((name: string) => ({
+                  name,
+                  quantity: 1
                 })),
                 status: 'pending_approval'
               })
@@ -263,12 +263,12 @@ export const chatbotService = {
 
   async initiatePayment(_bookingData: any) {
     try {
-        return {
-            key_id: 'rzp_test_mock',
-            amount: 10000,
-            order_id: `order_mock_${Date.now()}`,
-            reservation_id: `mock_${Date.now()}`
-        };
+      return {
+        key_id: 'rzp_test_mock',
+        amount: 10000,
+        order_id: `order_mock_${Date.now()}`,
+        reservation_id: `mock_${Date.now()}`
+      };
     } catch (e) {
       return {
         order_id: `order_mock_${Date.now()}`,
@@ -279,54 +279,71 @@ export const chatbotService = {
     }
   },
 
+  async getReservationStatus(reservationId: string) {
+    if (!reservationId || reservationId.includes('mock')) return null;
+    try {
+      const { data, error } = await supabase
+        .from('table_reservations')
+        .select('*')
+        .eq('id', reservationId)
+        .single();
+      
+      if (error) throw error;
+      return data;
+    } catch (e) {
+      console.warn("[Chatbot] Status check failed:", e);
+      return null;
+    }
+  },
+
   subscribeToReservation(reservationId: string, onUpdate: (payload: any) => void) {
     if (!reservationId || reservationId.includes('mock')) {
-      console.warn("Invalid reservation ID for realtime subscription:", reservationId);
+      console.warn("[Chatbot] Invalid ID for realtime:", reservationId);
       return { unsubscribe: () => {} };
     }
 
-    const safeChannel = `table_res_sync_${reservationId.substring(0, 8)}`;
-    console.log(`[Chatbot] GLOBAL Subscribing to: ${safeChannel} (ID: ${reservationId})`);
+    const channelName = `resv_sync_${reservationId.substring(0, 8)}`;
+    console.log(`[Chatbot] Subscribing to: ${channelName} for ID: ${reservationId}`);
     
-    return supabase
-      .channel(safeChannel)
+    const channel = supabase
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
           event: 'UPDATE',
           schema: 'public',
-          table: 'table_reservations'
-          // We remove the server side filter here to ensure the update reaches the client
+          table: 'table_reservations',
+          filter: `id=eq.${reservationId}`
         },
         (payload) => {
-          // CRITICAL: Manual Match in JS
-          if (payload.new.id === reservationId) {
-            const status = (payload.new.status || '').toLowerCase();
-            
-            if (status.includes('confirm')) {
-              onUpdate({
-                ...payload.new,
-                notification_payload: {
-                  title: "V GRAND OFFICIAL",
-                  body: `Hey king/queen! your status is approved ✅ we will make things ready in mean while. See you soon!`,
-                  type: 'whatsapp'
-                }
-              });
-            } else if (status.includes('reject')) {
-              onUpdate({
-                ...payload.new,
-                notification_payload: {
-                  title: "V GRAND UPDATE",
-                  body: `We apologize, but we are unable to fulfill your reservation request at this time. ❌ Please try another time or contact us directly.`,
-                  type: 'whatsapp'
-                }
-              });
-            }
+          console.log(`[Chatbot] Status Update for ${reservationId}:`, payload.new.status);
+          const status = (payload.new.status || '').toLowerCase();
+          
+          if (status.includes('confirm')) {
+            onUpdate({
+              ...payload.new,
+              notification_payload: {
+                title: "V GRAND OFFICIAL",
+                body: `Hey king/queen! Your reservation is APPROVED! ✅ We'll have everything ready for you. See you soon!`,
+                type: 'whatsapp'
+              }
+            });
+          } else if (status.includes('reject')) {
+            onUpdate({
+              ...payload.new,
+              notification_payload: {
+                title: "V GRAND UPDATE",
+                body: `We apologize, but we are unable to fulfill your reservation request at this time. ❌ Please try another time or contact us directly.`,
+                type: 'whatsapp'
+              }
+            });
           }
         }
       )
       .subscribe((status) => {
-        console.log(`[Chatbot] Subscription status:`, status);
+        console.log(`[Chatbot] Subscription status for ${reservationId}:`, status);
       });
+
+    return channel;
   },
 };
