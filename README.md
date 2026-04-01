@@ -1,32 +1,42 @@
-# V Grand Restaurant - Premium Ordering Platform
+# V Grand Restaurant - Premium Ordering & Management Platform 👑
 
-V Grand Restaurant is a modern, production-ready web application for restaurant ordering, specifically tailored for the "Raja of Biryanis" in Ongole. Built with a focus on speed, mobile responsiveness, and seamless user experience.
+V Grand Restaurant is a modern, high-performance web application designed for the "Raja of Biryanis" in Ongole. This production-ready platform combines a premium user-facing ordering site with a robust real-time management dashboard.
 
-## 🚀 Live Demo
-The application is currently configured for local development and testing.
+## 🚀 Live Features
 
-## ✨ Features
+### 🤖 Intelligent AI Chatbot
+- **Automated Reservations**: A step-by-step conversational flow for booking tables, collecting guest counts, and pre-ordering special dishes.
+- **Dual-Layer Architecture**: Uses Supabase Edge Functions for intelligent parsing with a robust local state-machine fallback.
+- **Real-time Status**: Instantly notifies users via the chat interface when an admin approves or rejects their reservation.
 
-- **Biryani Specialization**: Highlights signature dishes like Mutton Biryani and the "Special Kumbhakarna Biryani."
-- **Seamless Ordering**: Streamlined guest checkout flow without the need for mandatory authentication.
-- **Dynamic Cart**: Real-time shopping bag integration with live item counts and persistent state.
-- **Smart Delivery Fees**: Automated distance-based delivery fee calculation logic:
-  - **Free**: Within 10km for orders over ₹300.
-  - **₹30**: Within 10km for orders under ₹300.
-  - **₹50**: Beyond 10km or for far locations.
-- **Order Tracking**: "My Orders" page for tracking order history via phone number.
-- **WhatsApp Integration**: Direct "Order on WhatsApp" functionality for quick customer support and alternate ordering.
-- **Mobile-First Design**: Fully responsive UI with sticky navigation and premium aesthetics (#0F0F0F Dark, #8B0000 Red, #D4AF37 Gold).
+### 🛡️ Real-time Admin Dashboard
+- **Live Order Management**: Track and manage incoming orders as they happen.
+- **Reservation Control**: Approve or reject table bookings with one click, triggering instant customer notifications.
+- **Menu Management**: Real-time control over item availability, pricing, and "Bestseller" status.
+- **Review Moderation**: Seamlessly manage customer feedback before it goes live.
+
+### ✨ Premium User Experience
+- **Royal Luxury Aesthetic**: A high-end visual identity featuring deep "Biryani Red," "Royal Gold," and sleek dark themes.
+- **Biryani Specialization**: High-impact "Biryani Frames" and hero sections dedicated to signature dishes like the "Kumbhakarna Biryani."
+- **Smart Logistics**: Integrated distance-based delivery fee calculations and automated guest checkouts.
+- **WhatsApp Integration**: Direct-to-WhatsApp ordering and customer support buttons.
 
 ## 🛠️ Tech Stack
 
-- **Frontend**: [React](https://reactjs.org/) + [TypeScript](https://www.typescriptlang.org/)
-- **Build Tool**: [Vite](https://vitejs.dev/)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com/) + [Radix UI](https://www.radix-ui.com/)
-- **State Management**: React Context & Hooks
-- **Backend/Database**: [Supabase](https://supabase.com/)
-- **Icons**: Lucide React
-- **Animations**: Motion
+### Frontend & UI
+- **React (v18)** + **TypeScript**: Robust, type-safe functional components.
+- **Vite**: Ultra-fast build tool for optimal performance.
+- **Tailwind CSS**: Utility-first styling for a completely responsive layout.
+- **Radix UI + Shadcn/UI**: Premium, accessible UI components.
+- **Framer Motion**: Smooth animations and high-quality transitions.
+
+### Backend & Infrastructure
+- **Supabase (BaaS)**: 
+  - **PostgreSQL**: Structured data storage.
+  - **Realtime**: Instant sync between Admin and User interfaces.
+  - **Edge Functions**: Serverless logic for Chatbot and Payment processing.
+- **Zod + React Hook Form**: Strict schema validation and efficient form management.
+- **Lucide React**: Modern iconography.
 
 ## 📦 Getting Started
 
@@ -47,7 +57,7 @@ The application is currently configured for local development and testing.
    ```
 
 3. Environment Setup:
-   Create a `.env` file in the root directory and add your Supabase credentials:
+   Create a `.env` file in the root directory:
    ```env
    VITE_SUPABASE_URL=your_supabase_url
    VITE_SUPABASE_ANON_KEY=your_anon_key
@@ -55,34 +65,24 @@ The application is currently configured for local development and testing.
 
 4. Run the development server:
    ```bash
-   npx vite --host 127.0.0.1
+   npm run dev
    ```
-   Open [http://127.0.0.1:5173/](http://127.0.0.1:5173/) in your browser.
 
 ## 📁 Project Structure
 
 ```text
 ├── src/
-│   ├── components/    # Reusable UI components
-│   ├── pages/         # Page-level components (Home, Menu, Checkout, My Orders)
-│   ├── context/       # Global state management
-│   ├── services/      # Supabase & API interaction logic
-│   ├── layout/        # Shared layouts (Navbar, Footer)
-│   ├── lib/           # Utility functions (cn, delivery fee logic)
-│   ├── types/         # TypeScript definitions
-│   └── main.tsx       # Entry point
-├── supabase/          # Database migrations & schemas
-├── public/            # Static assets
-└── tailwind.config.js # Styling configurations
+│   ├── admin/         # Real-time Management Dashboard
+│   ├── components/    # UI Components (chatbot, restaurant, ui helpers)
+│   ├── contexts/      # Global state management (Cart, Chat, Auth)
+│   ├── db/            # Supabase & API logic (api.ts, supabase.ts)
+│   ├── services/      # Business logic (chatbotService.ts)
+│   ├── hooks/         # Custom React hooks
+│   ├── pages/         # Page components (Home, Menu, FunctionHall)
+│   └── main.tsx       # Application entry point
+├── supabase/          # Edge Functions & Database migrations
+└── tailwind.config.js # Custom design tokens & theme
 ```
 
-## 🛡️ Security & Quality
-- **Audit**: Zero high-risk vulnerabilities found in dependency audit.
-- **Linting**: Biome-based linting for code quality.
-- **Safety**: Null/undefined safety checks implemented across all data-driven components.
-
 ## 📄 License
-Internal use only.
-
----
-Developed for **V Grand Restaurant - Raja of Biryanis.**
+Internal use only. Developed for **V Grand Restaurant - Raja of Biryanis.**
