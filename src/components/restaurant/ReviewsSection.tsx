@@ -1,27 +1,28 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Star } from 'lucide-react';
+import { Star, ExternalLink } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const reviewsData = [
   {
-    name: "Rahul Naidu",
+    name: "Teja Pasupu Reddy",
     rating: 5,
-    text: "Had an amazing dining experience here! The biryani was absolutely delicious and full of flavor. The ambiance is very pleasant and perfect for family dinners. Staff were polite and service was quick. Definitely one of the best places I’ve visited recently!"
+    text: "Today it was our first visit on my friend's suggestion stepping to dine in v grand family restaurant it was an amazing experience to us starters and biryanis we ordered are hot and delicious.service and hospitality is very impressive.our chicken enjoyed a lot with funny ambience with hanging monkeys. over-all our whole family are fully satisfied with tasty food and good service. Very soon you can expect our visit once again 👍"
   },
   {
-    name: "Sneha Reddy",
+    name: "Sam son",
     rating: 5,
-    text: "Loved the food and the overall vibe of the restaurant. Everything we ordered was fresh and tasty, especially the starters and biryani. The place is clean and well maintained. Great spot to hang out with friends and family!"
+    text: "Our first visit to v Grand family restaurant is amazing experience. Nonveg and veg starters are very tasty. Mutton fry piece biryani, chicken dum biryani and boneless biryani is very good well cooked and served hot.we are fully satisfied with the food and service with good receiving. Ambience is very funny with hanging monkeys and good traditional paintings.suggeted good family restaurant in Ongole to done with family and friends. You can expect our next visit very soon ."
   },
   {
-    name: "Arjun Chowdary",
+    name: "Pathi Prasad",
     rating: 5,
-    text: "Fantastic experience! The food quality is top-notch and the taste is consistent. The ambiance is cozy and welcoming. Service was smooth and staff were very friendly. Highly recommend trying their biryani and curries."
+    text: "Today was an amazing experience tasting chicken hot and sour soup, panner manchuria, special chicken Tikka, and Butter nan with casewnut curry and Ajanta chicken biriyani. All the items we ordered are delicious, served hot in patron.our whole family are fully satisfied. You can expect our next visit very soon."
   },
   {
-    name: "Priya Yadav",
+    name: "Haribabu Dasari",
     rating: 5,
-    text: "Visited with family and had a wonderful time. The food was really good and served hot. The staff made sure everything was comfortable for us. Nice ambiance and overall a great place for family outings. Will definitely visit again!"
+    text: "Our staff birthday celebration was gone very interesting to remember with tasty starters and delicious biryani ,we are all fully satisfied with good service and reception given."
   }
 ];
 
@@ -68,6 +69,22 @@ const ReviewsSection: React.FC = () => {
                 </CardContent>
             </Card>
           ))}
+        </div>
+        <div className="mt-16 text-center">
+            <Button 
+                asChild
+                className="bg-primary text-black hover:bg-white transition-all duration-300 rounded-none h-14 px-8 font-black uppercase italic tracking-widest group"
+            >
+                <a 
+                    href="https://www.google.com/maps/place/V+Grand+Family+Restaurant/@15.5136422,80.0445997,17z/data=!4m8!3m7!1s0x3a4b01a96f9d5b31:0x2fc60717d054e9c3!8m2!3d15.513637!4d80.0471746!9m1!1b1!16s%2Fg%2F11gdd9zx6p?entry=ttu&g_ep=EgoyMDI2MDQwMS4wIKXMDSoASAFQAw%3D%3D" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2"
+                >
+                    View All Reviews
+                    <ExternalLink className="w-4 h-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
+                </a>
+            </Button>
         </div>
       </div>
     </section>
